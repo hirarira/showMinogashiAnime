@@ -12,9 +12,13 @@
       this.channel = in_set.ChName;
       this.channelID = in_set.ChID;
       this.subTitle = in_set.SubTitle;
+      this.hashTag = in_set.hashTag;
+      this.minogashi = in_set.minogashi;
+      this.comment = in_set.comment;
       this.url = in_set.Urls;
+      this.characterURL = in_set.characterURL;
       this.topUrl = this.url.split("\t")[0];
-      this.minogashi = (in_set.UPSFlag==1);
+      this.minogashi_sb = (in_set.UPSFlag==1);
       this.tid = in_set.TID;
       this.subtitleListUrl = "http://cal.syoboi.jp/tid/"+this.tid+"/subtitle";
     }
@@ -61,6 +65,17 @@
     methods:{
       minogashi: function(url){
         return url;
+      },
+      changeMinogashi: function(e){
+        e.minogashi = !e.minogashi;
+        $.post("./server/changeStory.php",{
+          tid: e.tid,
+          count: e.count,
+          minogashi: e.minogashi,
+          comment: e.comment
+        },(res)=>{
+          console.log(res);
+        });
       }
     }
   });
@@ -77,7 +92,7 @@
   let startDateFormat = date_format(startDate);
   // UPSFlag
   let userName = "hirarira617";
-  let in_url = "./getShoboi.php";
+  let in_url = "./server/getShoboi.php";
   console.log(in_url);
   $.get(in_url,{
     filter: 1,
