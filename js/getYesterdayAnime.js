@@ -11,8 +11,7 @@
   let app = new Vue({
     el: '#app',
     data: {
-      list: AnimeDataSet,
-      commentURL: './setComment.html?'
+      list: AnimeDataSet
     },
     methods:{
       minogashi: function(url){
