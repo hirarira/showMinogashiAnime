@@ -22,7 +22,7 @@
           <li class="nav-item">
             <a class="nav-link" href="./index.html">アニメTOP</a>
           </li>
-          <li class="nav-item active">
+          <li class="nav-item">
             <a class="nav-link" href="./todayAnime.html">今日のアニメ一覧</a>
           </li>
           <li class="nav-item">
@@ -41,52 +41,65 @@
       </div>
     </nav>
     <!-- メニューここまで -->
-    <h1 class="text-center">今日のアニメ</h1>
     <div id="app">
-      <table class="table table-hover table-bordered">
-        <thead>
-          <tr>
-            <th scope="col" class="text-nowrap">ID</th>
-            <th scope="col" class="text-nowrap">タイトル</th>
-            <th scope="col" class="text-nowrap">回</th>
-            <th scope="col" class="text-nowrap d-none d-sm-table-cell">サブタイ</th>
-            <th scope="col" class="text-nowrap d-none d-sm-table-cell">放送日</th>
-            <th scope="col" class="text-nowrap">放送時刻</th>
-            <th scope="col" class="text-nowrap">放送局</th>
-            <th scope="col" class="text-nowrap d-none d-lg-table-cell">ハッシュタグ</th>
-            <th scope="col" class="text-nowrap d-none d-lg-table-cell">放送開始まで</th>
-            <th scope="col" class="text-nowrap d-none d-lg-table-cell">公式サイト</th>
-            <th scope="col" class="text-nowrap d-none d-lg-table-cell">Character</th>
-            <th scope="col" class="text-nowrap">チェック用URL</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in list" v-bind:class="{ 'table-danger': !item.minogashi }">
-            <td> {{item.id + 1}} </td>
-            <td> {{item.title}} </td>
-            <td> {{item.count}} </td>
-            <td class="d-none d-sm-table-cell"> <a v-bind:href="item.commentURL" class="btn-link">{{item.subTitle}}</a> </td>
-            <td class="text-nowrap d-none d-sm-table-cell"> {{item.startTime.getMonth()+1}} / {{item.startTime.getDate()}} ( {{item.youbi[ item.startTime.getDay() ]}} )</td>
-            <td class="text-nowrap"> {{('0'+item.startTime.getHours()).slice(-2)}} : {{('0'+item.startTime.getMinutes()).slice(-2)}} </td>
-            <td class="text-nowrap"> {{item.channel}} </td>
-            <td class="text-nowrap d-none d-lg-table-cell">  {{item.hashTag}} </td>
-            <td class="text-nowrap d-none d-lg-table-cell"> {{('0'+item.countDown.getUTCHours()).slice(-2)}} : {{('0'+item.countDown.getUTCMinutes()).slice(-2)}} : {{('0'+item.countDown.getUTCSeconds()).slice(-2)}} </td>
-            <td class="text-nowrap d-none d-lg-table-cell"> <a v-bind:href="item.topUrl" class="btn-info">公式サイト</a> </td>
-            <td class="text-nowrap d-none d-lg-table-cell"> <a v-if="item.characterURL" v-bind:href="item.characterURL" class="btn-primary">Character</a> </td>
-            <td class="text-nowrap"> <button v-on:click="changeMinogashi(item)" class="btn-success">見逃し</a> </td>
-          </tr>
-        </tbody>
-      </table>
+      <h1 class="text-center" v-if="anime">{{anime.title}}:第{{anime.Count}}話のコメント追加</h1>
+      <h2 class="text-center"> {{error}} </h2>
+      <div v-if="anime">
+        <table class="table table-hover table-bordered">
+          <tbody>
+            <tr>
+              <td> タイトル </td>
+              <td> {{anime.title}} </td>
+            </tr>
+            <tr>
+              <td> サブタイトル </td>
+              <td> {{anime.SubTitle}} </td>
+            </tr>
+            <tr>
+              <td> 回数 </td>
+              <td> {{anime.Count}} </td>
+            </tr>
+            <tr>
+              <td> 放送局 </td>
+              <td> {{anime.chName}} </td>
+            </tr>
+            <tr>
+              <td> URL </td>
+              <td> <a v-bind:href="anime.url.split('	')[0]">公式サイト</a> </td>
+            </tr>
+            <tr>
+              <td> Character </td>
+              <td> <a v-bind:href="anime.characterURL">Character</a> </td>
+            </tr>
+            <tr>
+              <td> 放送日 </td>
+              <td> {{anime.StTime}} </td>
+            </tr>
+            <tr>
+              <td> 見逃し </td>
+              <td> {{anime.minogashi}} </td>
+            </tr>
+            <tr>
+              <td> コメント </td>
+              <td> {{anime.comment}} </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="form-group">
+          <label for="exampleFormControlTextarea1">コメントの編集</label>
+          <textarea class="form-control" id="animeComment" rows="3" v-model="message">{{anime.comment}}</textarea>
+          <button class="btn btn-primary" v-on:click="updateComment()">送信する</button>
+        </div>
+      </div>
     </div>
-
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
-    <script type="text/javascript" src="./js/animedata.js"></script>
-    <script type="text/javascript" src="./js/getToadyAnime.js"></script>
+    <script type="text/javascript" src="./js/addComment.js"></script>
   </body>
 </html>

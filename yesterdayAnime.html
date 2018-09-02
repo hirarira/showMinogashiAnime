@@ -63,7 +63,7 @@
             <td> {{item.id}} </td>
             <td> {{item.title}} </td>
             <td> {{item.count}} </td>
-            <td class="d-none d-sm-table-cell"> {{item.subTitle}} </td>
+            <td class="d-none d-sm-table-cell"> <a v-bind:href="item.commentURL" class="btn-link">{{item.subTitle}}</a> </td>
             <td class="text-nowrap d-none d-lg-table-cell"> {{item.startTime.getMonth()+1}} / {{item.startTime.getDate()}} ( {{item.youbi[ item.startTime.getDay() ]}} )</td>
             <td class="text-nowrap"> {{('0'+item.startTime.getHours()).slice(-2)}} : {{('0'+item.startTime.getMinutes()).slice(-2)}} </td>
             <td class="text-nowrap"> {{item.channel}} </td>
@@ -83,6 +83,7 @@
 
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script type="text/javascript" src="./js/animedata.js"></script>
     <script type="text/javascript" src="./js/getYesterdayAnime.js"></script>
   </body>
 </html>
