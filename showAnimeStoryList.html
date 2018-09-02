@@ -42,54 +42,53 @@
     </nav>
     <!-- メニューここまで -->
     <div id="app">
-      <h1 class="text-center" v-if="anime">{{anime.title}}:第{{anime.Count}}話のコメント追加</h1>
+      <h1 class="text-center" v-if="anime">{{anime[0].title}}:各話リスト</h1>
       <h2 class="text-center"> {{error}} </h2>
       <div v-if="anime">
         <table class="table table-hover table-bordered">
           <tbody>
             <tr>
               <td> タイトル </td>
-              <td> {{anime.title}} </td>
-            </tr>
-            <tr>
-              <td> サブタイトル </td>
-              <td> {{anime.SubTitle}} </td>
-            </tr>
-            <tr>
-              <td> 回数 </td>
-              <td> {{anime.Count}} </td>
+              <td> {{anime[0].title}} </td>
             </tr>
             <tr>
               <td> 放送局 </td>
-              <td> {{anime.chName}} </td>
+              <td> {{anime[0].chName}} </td>
             </tr>
             <tr>
-              <td> URL </td>
-              <td> <a v-bind:href="anime.url.split('	')[0]">公式サイト</a> </td>
+              <td> hashTag </td>
+              <td> {{anime[0].hashTag}} </td>
             </tr>
             <tr>
-              <td> Character </td>
-              <td> <a v-bind:href="anime.characterURL">Character</a> </td>
+              <td> 公式サイト </td>
+              <td class="text-nowrap d-none d-lg-table-cell"> <a v-bind:href="anime[0].url.split('	')[0]" class="btn-link">公式サイト</a> </td>
             </tr>
             <tr>
-              <td> 放送日 </td>
-              <td> {{ new Date(Number(anime.StTime) * 1000) }} </td>
-            </tr>
-            <tr>
-              <td> 見逃し </td>
-              <td> {{anime.minogashi}} </td>
-            </tr>
-            <tr>
-              <td> コメント </td>
-              <td> {{anime.comment}} </td>
+              <td> characterURL </td>
+              <td class="text-nowrap d-none d-lg-table-cell"> <a v-bind:href="anime[0].characterURL" class="btn-link">characterURL</a> </td>
             </tr>
           </tbody>
         </table>
-        <div class="form-group">
-          <label for="exampleFormControlTextarea1">コメントの編集</label>
-          <textarea class="form-control" id="animeComment" rows="3" v-model="message">{{anime.comment}}</textarea>
-          <button class="btn btn-primary" v-on:click="updateComment()">送信する</button>
-        </div>
+        <table class="table table-hover table-bordered">
+          <thead>
+            <tr>
+              <th scope="col" class="text-nowrap">回</th>
+              <th scope="col" class="text-nowrap">サブタイ</th>
+              <th scope="col" class="text-nowrap d-none d-sm-table-cell">放送日</th>
+              <th scope="col" class="text-nowrap">コメント</th>
+              <th scope="col" class="text-nowrap">チェック用URL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="story in anime" v-bind:class="{ 'table-danger': story.minogashi == 0 }">
+              <td> {{story.Count}} </td>
+              <td> <a v-bind:href="story.commentURL" class="btn-link">{{story.SubTitle}}</a> </td>
+              <td class="text-nowrap d-none d-sm-table-cell"> {{story.startTime.getMonth()+1}} / {{story.startTime.getDate()}}</td>
+              <td class="d-none d-sm-table-cell"> {{story.comment}} </td>
+              <td class="text-nowrap"> <button v-on:click="changeMinogashi(story)" class="btn-success">見逃し</a> </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     <!-- Optional JavaScript -->
@@ -100,6 +99,6 @@
 
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
-    <script type="text/javascript" src="./js/addComment.js"></script>
+    <script type="text/javascript" src="./js/getAnimeStoryList.js"></script>
   </body>
 </html>

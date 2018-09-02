@@ -61,7 +61,7 @@
         <tbody>
           <tr v-for="item in list" v-bind:class="{ 'table-danger': !item.minogashi }">
             <td> {{item.id}} </td>
-            <td> {{item.title}} </td>
+            <td> <a v-bind:href="item.animeListURL" class="btn-link">{{item.title}}</a> </td>
             <td> {{item.count}} </td>
             <td class="d-none d-sm-table-cell"> <a v-bind:href="item.commentURL" class="btn-link">{{item.subTitle}}</a> </td>
             <td class="text-nowrap d-none d-lg-table-cell"> {{item.startTime.getMonth()+1}} / {{item.startTime.getDate()}} ( {{item.youbi[ item.startTime.getDay() ]}} )</td>

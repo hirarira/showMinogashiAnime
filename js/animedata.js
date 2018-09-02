@@ -19,6 +19,7 @@ class AnimeData{
     this.tid = in_set.TID;
     this.subtitleListUrl = "http://cal.syoboi.jp/tid/"+this.tid+"/subtitle";
     this.commentURL = "./setComment.html?tid="+this.tid+"&count="+this.count;
+    this.animeListURL = "showAnimeStoryList.html?tid="+this.tid;
     this.setCountDown();
   }
   showInfo(){
