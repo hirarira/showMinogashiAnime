@@ -72,6 +72,9 @@
         for(let i=0; i<app.anime.length; i++){
           app.anime[i].commentURL = "./setComment.html?tid="+app.anime[i].TID+"&count="+app.anime[i].Count;
           app.anime[i].startTime = new Date(Number(app.anime[i].StTime * 1000));
+          if(app.anime[i].SubTitle === ''　|| app.anime[i].SubTitle === null){
+            app.anime[i].SubTitle = '(サブタイなし)';
+          }
         }
       })
       .fail((e)=>{

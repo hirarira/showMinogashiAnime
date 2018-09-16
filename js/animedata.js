@@ -9,6 +9,9 @@ class AnimeData{
     this.channel = in_set.ChName;
     this.channelID = in_set.ChID;
     this.subTitle = in_set.SubTitle;
+    if(this.subTitle === ''　|| this.subTitle === null){
+      this.subTitle = '(サブタイなし)';
+    }
     this.hashTag = in_set.hashTag;
     this.minogashi = in_set.minogashi;
     this.comment = in_set.comment;
