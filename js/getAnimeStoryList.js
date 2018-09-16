@@ -37,6 +37,17 @@
           },(res)=>{
             console.log(res);
           });
+        },
+        updateReview: function(){
+          console.log("test");
+          $.post("./server/postAnimeReview.php",{
+            tid: this.review.TID,
+            rank: this.review.評価,
+            number: this.review.話数,
+            comment: this.review.コメント
+          },(res)=>{
+            console.log(res);
+          });
         }
       }
     });
