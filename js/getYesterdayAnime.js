@@ -42,7 +42,6 @@
   let startDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() - 1, endDate.getHours(), endDate.getMinutes());
   let startDateFormat = date_format(startDate);
   // UPSFlag
-  let userName = "hirarira617";
   let in_url = "./server/getShoboi.php";
   console.log(in_url);
   $.get(in_url,{
