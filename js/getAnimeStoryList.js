@@ -14,7 +14,8 @@
         message: null,
         showComment: null,
         review: null,
-        loading: true
+        loading: true,
+        changeResult: null
       },
       methods:{
         updateComment: function(){
@@ -46,6 +47,7 @@
             number: this.review.話数,
             comment: this.review.コメント
           },(res)=>{
+            this.changeResult = res;
             console.log(res);
           });
         }
