@@ -58,6 +58,7 @@
         app.anime = res[0];
         app.message = app.anime.comment;
         app.showComment = app.anime.comment.replace("\n", "\r\n");
+        app.anime.animeListURL = "./showAnimeStoryList.html?tid="+app.anime.TID;
       })
       .fail((e)=>{
         app.error = e.toString();
