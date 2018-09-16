@@ -12,7 +12,9 @@
         error: null,
         anime: null,
         message: null,
-        showComment: null
+        showComment: null,
+        review: null,
+        loading: true
       },
       methods:{
         updateComment: function(){
@@ -76,6 +78,18 @@
             app.anime[i].SubTitle = '(サブタイなし)';
           }
         }
+        $.ajax({
+          type: 'GET',
+          url: "./server/getAnimeReview.php",
+          data: {
+            tid: params.tid
+          },
+          dataType: 'json'
+        })
+        .then((res)=>{
+          app.review = res[0];
+          app.loading = false;
+        });
       })
       .fail((e)=>{
         app.error = e.toString();
