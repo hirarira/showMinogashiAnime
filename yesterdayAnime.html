@@ -53,6 +53,7 @@
             <th scope="col" class="text-nowrap d-none d-sm-table-cell">サブタイ</th>
             <th scope="col" class="text-nowrap d-none d-lg-table-cell">放送日</th>
             <th scope="col" class="text-nowrap">放送時刻</th>
+            <th scope="col" class="text-nowrap d-none d-xl-table-cell">コメント</th>
             <th scope="col" class="text-nowrap">放送局</th>
             <th scope="col" class="text-nowrap d-none d-lg-table-cell">公式サイト</th>
             <th scope="col" class="text-nowrap">チェック用URL</th>
@@ -66,6 +67,7 @@
             <td class="d-none d-sm-table-cell"> <a v-bind:href="item.commentURL" class="btn-link">{{item.subTitle}}</a> </td>
             <td class="text-nowrap d-none d-lg-table-cell"> {{item.startTime.getMonth()+1}} / {{item.startTime.getDate()}} ( {{item.youbi[ item.startTime.getDay() ]}} )</td>
             <td class="text-nowrap"> {{('0'+item.startTime.getHours()).slice(-2)}} : {{('0'+item.startTime.getMinutes()).slice(-2)}} </td>
+            <td class="d-none d-xl-table-cell"> {{item.comment}} </td>
             <td class="text-nowrap"> {{item.channel}} </td>
             <td class="text-nowrap d-none d-lg-table-cell"> <a v-bind:href="item.topUrl" class="btn-info">公式サイト</a> </td>
             <td class="text-nowrap"> <button v-on:click="changeMinogashi(item)" class="btn-success">見逃し</a> </td>
