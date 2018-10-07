@@ -40,7 +40,6 @@
           });
         },
         updateReview: function(){
-          console.log("test");
           $.post("./server/postAnimeReview.php",{
             tid: this.review.TID,
             rank: this.review.評価,
@@ -48,7 +47,6 @@
             comment: this.review.コメント
           },(res)=>{
             this.changeResult = res;
-            console.log(res);
           });
         }
       }
