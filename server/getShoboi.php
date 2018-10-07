@@ -18,6 +18,7 @@
     $set_query = 'insert into anime ( `tid`, `title`, `chname`, `url` ) VALUES (?, ?, ?, ?)';
     $get_story_query = 'select * from animeStory where (tid = ? AND count = ?)';
     $set_story_query = 'insert into animeStory ( `tid`, `Count`, `StTime`, `EdTime`, `LastUpdate`, `SubTitle` ) VALUES (?, ?, ?, ?, ?, ?)';
+    $update_story_query = 'update animeStory set `StTime` = ?, `EdTime` = ?,`LastUpdate` = ?, `SubTitle` = ? where `id` = ?';
     for($i=0; $i< count($animeList->items); $i++){
       $get = $pdo->prepare($get_query);
       $get->bindValue(1, $animeList->items[$i]->TID);
@@ -51,13 +52,29 @@
           $setStory->bindValue(3, $animeList->items[$i]->StTime);
           $setStory->bindValue(4, $animeList->items[$i]->EdTime);
           $setStory->bindValue(5, $animeList->items[$i]->LastUpdate);
-          $setStory->bindValue(6, $animeList->items[$i]->SubTitle);
+          // サブタイがNULLのときは空白を登録
+          if(is_null($animeList->items[$i]->SubTitle)){
+            $setStory->bindValue(6, '');
+          }
+          else{
+            $setStory->bindValue(6, $animeList->items[$i]->SubTitle);
+          }
           $setStory->execute();
         }
         else{
           $res = $getStory->fetchAll()[0];
           $animeList->items[$i]->minogashi = ($res['minogashi'] == 1);
           $animeList->items[$i]->comment = $res['comment'];
+          // 更新を行う
+          if($res["SubTitle"] != $animeList->items[$i]->SubTitle){
+            $updateStory = $pdo->prepare($update_story_query);
+            $updateStory->bindValue(1, $animeList->items[$i]->StTime);
+            $updateStory->bindValue(2, $animeList->items[$i]->EdTime);
+            $updateStory->bindValue(3, $animeList->items[$i]->LastUpdate);
+            $updateStory->bindValue(4, $animeList->items[$i]->SubTitle);
+            $updateStory->bindValue(5, $res['id']);
+            $updateStory->execute();
+          }
         }
       }
     }
