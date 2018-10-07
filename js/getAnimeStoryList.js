@@ -15,7 +15,8 @@
         showComment: null,
         review: null,
         loading: true,
-        changeResult: null
+        changeResult: null,
+        sb_url: null
       },
       methods:{
         updateComment: function(){
@@ -62,6 +63,7 @@
       if(typeof params[needParams] === 'undefined'){
         throw new Error("必要なパラメーター["+needParams[param]+"]がないです");
       }
+      app.sb_url = "http://cal.syoboi.jp/tid/" + params.tid;
       // Ajaxで該当するのを取得
       $.ajax({
         type: 'POST',
