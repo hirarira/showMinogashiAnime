@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="./style.css">
-    <title>アニメ関連</title>
+    <title>見逃しアニメ一覧</title>
   </head>
   <body>
     <!-- メニューここから -->
@@ -31,10 +29,10 @@
           <li class="nav-item">
             <a class="nav-link" href="./minogashi.html">見逃しアニメ一覧</a>
           </li>
-          <li class="nav-item active">
+          <li class="nav-item">
             <a class="nav-link" href="./anyAnime.html">任意の日のアニメ</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item active">
             <a class="nav-link" href="./minogashiALL.html">見逃しアニメ一覧（全期間）</a>
           </li>
           <li class="nav-item">
@@ -44,19 +42,9 @@
       </div>
     </nav>
     <!-- メニューここまで -->
-    <h2 class="text-center">日付指定</h2>
+
+    <h1  class="text-center">見逃しアニメ一覧(全期間)</h1>
     <div id="app">
-      <div class="form-group">
-        <label for="exampleInputEmail1">確認したい日付を指定してください</label>
-        <input v-model="setDate" type="date" class="form-control" id="exampleInputEmail1" placeholder="日付"  debounce="500">
-      </div>
-      <button v-on:click="searchAnime" class="btn btn-primary">取得する</button>
-      <button v-on:click="beforeWeek" class="btn btn-primary">先週</button>
-      <button v-on:click="beforeDay" class="btn btn-primary">前の日</button>
-      <button v-on:click="afterDay" class="btn btn-primary">次の日</button>
-      <button v-on:click="afterWeek" class="btn btn-primary">来週</button>
-      <hr>
-      <h2 class="text-center"> {{startDate.getMonth()+1}} / {{startDate.getDate()}} ( {{youbi[ startDate.getDay() ]}} ) のアニメ </h2>
       <table class="table table-hover table-bordered">
         <thead>
           <tr>
@@ -64,24 +52,20 @@
             <th scope="col" class="text-nowrap">タイトル</th>
             <th scope="col" class="text-nowrap">回</th>
             <th scope="col" class="text-nowrap d-none d-sm-table-cell">サブタイ</th>
-            <th scope="col" class="text-nowrap d-none d-sm-table-cell">放送日</th>
-            <th scope="col" class="text-nowrap">放送時刻</th>
-            <th scope="col" class="text-nowrap d-none d-xl-table-cell">コメント</th>
-            <th scope="col" class="text-nowrap">放送局</th>
+            <th scope="col" class="text-nowrap">放送日</th>
+            <th scope="col" class="text-nowrap d-none d-sm-table-cell">放送時刻</th>
             <th scope="col" class="text-nowrap d-none d-lg-table-cell">公式サイト</th>
             <th scope="col" class="text-nowrap">チェック用URL</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in list" v-bind:class="{ 'table-danger': !item.minogashi }">
+          <tr v-for="item in list">
             <td> {{item.id}} </td>
             <td> <a v-bind:href="item.animeListURL" class="btn-link">{{item.title}}</a> </td>
             <td> {{item.count}} </td>
             <td class="d-none d-sm-table-cell"> <a v-bind:href="item.commentURL" class="btn-link">{{item.subTitle}}</a> </td>
-            <td class="text-nowrap d-none d-sm-table-cell"> {{item.startTime.getMonth()+1}} / {{item.startTime.getDate()}} ( {{item.youbi[ item.startTime.getDay() ]}} )</td>
-            <td class="text-nowrap"> {{('0'+item.startTime.getHours()).slice(-2)}} : {{('0'+item.startTime.getMinutes()).slice(-2)}} </td>
-            <td class="d-none d-xl-table-cell"> {{item.comment}} </td>
-            <td class="text-nowrap"> {{item.channel}} </td>
+            <td class="text-nowrap"> {{item.startTime.getMonth()+1}} / {{item.startTime.getDate()}} ( {{item.youbi[ item.startTime.getDay() ]}} )</td>
+            <td class="text-nowrap d-none d-sm-table-cell"> {{('0'+item.startTime.getHours()).slice(-2)}} : {{('0'+item.startTime.getMinutes()).slice(-2)}}</td>
             <td class="text-nowrap d-none d-lg-table-cell"> <a v-bind:href="item.topUrl" class="btn-info">公式サイト</a> </td>
             <td class="text-nowrap"> <button v-on:click="changeMinogashi(item)" class="btn-success">見逃し</a> </td>
           </tr>
@@ -98,7 +82,7 @@
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script type="text/javascript" src="./js/userConfig.js"></script>
-    <script type="text/javascript" src="./js/animedata.js"></script>
-    <script type="text/javascript" src="./js/getAnydayAnime.js"></script>
+    <script type="text/javascript" src="./js/animedataDB.js"></script>
+    <script type="text/javascript" src="./js/getMinohashiAnimeAll.js"></script>
   </body>
 </html>
