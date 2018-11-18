@@ -86,7 +86,7 @@
         },
         changeMinogashi: function(e){
           e.minogashi = !e.minogashi;
-          $.post("./server/changeStory.php",{
+          $.post("./server/server.php/changeStory",{
             tid: e.tid,
             count: e.count,
             minogashi: e.minogashi,

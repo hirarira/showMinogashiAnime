@@ -17,7 +17,7 @@
       },
       methods:{
         updateComment: function(){
-          $.post("./server/changeStory.php",{
+          $.post("./server/server.php/changeStory",{
             tid: this.anime.tid,
             count: this.anime.Count,
             minogashi: this.anime.minogashi == 0 ? 'false': 'true',
@@ -28,7 +28,7 @@
         },
         changeMinogashi: function(e){
           e.minogashi = e.minogashi == 0?1:0;
-          $.post("./server/changeStory.php",{
+          $.post("./server/server.php/changeStory",{
             tid: e.TID,
             count: e.Count,
             minogashi: e.minogashi == 0?'false':'true',
