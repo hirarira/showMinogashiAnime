@@ -99,4 +99,30 @@ $app->get('/getShoboi',function(Request $request, Response $response){
   return $response;
 });
 
+$app->post('/changeStory',function(Request $request, Response $response){
+  $getBodys = $request->getParsedBody();
+  $tid = $getBodys["tid"];
+  $count = $getBodys["count"];
+  $minogashi = $getBodys["minogashi"];
+  $comment = $getBodys["comment"];
+  $response = $response->withHeader('Content-type', 'application/json');
+  try{
+    $setMinogashi = $minogashi == 'true'? 1: 0;
+    require_once './password.php';
+    $pdo = new PDO('mysql:dbname=anime;host=localhost;charset=utf8mb4', $connect['user'], $connect['pass']);
+    $update_query = 'update animeStory SET minogashi = ?, comment = ? WHERE tid = ? AND count = ?';
+    $update = $pdo->prepare($update_query);
+    $update->bindValue(1, $setMinogashi);
+    $update->bindValue(2, $comment);
+    $update->bindValue(3, $tid);
+    $update->bindValue(4, $count);
+    $update->execute();
+    $res = array("states"=>"ok");
+  } catch (PDOException $e) {
+    $res = array("states"=>"error");
+  }
+  $response->getBody()->write( json_encode($res) );
+  return $response;
+});
+
 $app->run();
