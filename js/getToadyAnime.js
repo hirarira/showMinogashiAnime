@@ -36,7 +36,7 @@
    *
    */
   // UPSFlag
-  let in_url = "./server/getShoboi.php";
+  let in_url = "./server/server.php/getShoboi";
   console.log(in_url);
   $.get(in_url,{
     filter: 1,
