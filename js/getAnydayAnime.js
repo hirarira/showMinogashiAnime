@@ -9,7 +9,7 @@
   function getAjaxAnimedata(startDateFormat, endDateFormat, AnimeDataSet){
     AnimeDataSet.splice(0, AnimeDataSet.length);
     // UPSFlag
-    let in_url = "./server/getShoboi.php";
+    let in_url = "./server/server.php/getShoboi";
     $.get(in_url,{
       filter: 1,
       alt: "json",

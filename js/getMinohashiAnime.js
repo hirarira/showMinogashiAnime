@@ -44,7 +44,7 @@
     endDate.getHours(), endDate.getMinutes());
   let startDateFormat = date_format(startDate);
   // UPSFlag
-  let in_url = "./server/getShoboi.php";
+  let in_url = "./server/server.php/getShoboi";
   console.log(in_url);
   $.get(in_url,{
     filter: 1,
