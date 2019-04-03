@@ -108,7 +108,7 @@
         });
         // 基礎情報を入れていく
         app.hashTag = app.anime[0].hashTag;
-        app.publicURL = app.anime[0].url.split('	')[0];
+        app.publicURL = app.anime[0].publicURL == "" ? app.anime[0].url.split('	')[0] : app.anime[0].publicURL;
         app.characterURL = app.anime[0].characterURL;
       })
       .fail((e)=>{
