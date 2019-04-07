@@ -3,7 +3,7 @@
   $count = $_POST["count"];
   try{
     require_once './password.php';
-    $pdo = new PDO('mysql:dbname=anime;host=localhost;charset=utf8mb4', $connect['user'], $connect['pass']);
+    
     $get_anime_query =
       'select * from
       animeStory AS T1

@@ -26,7 +26,7 @@ $app->get('/getShoboi',function(Request $request, Response $response){
   $response = $response->withHeader('Content-type', 'application/json');
   // DB接続
   try {
-    $pdo = new PDO('mysql:dbname=anime;host=localhost;charset=utf8mb4', $connect['user'], $connect['pass']);
+
     // DBに保存
     $get_query = 'select * from anime where tid = ?';
     $set_query = 'insert into anime ( `tid`, `title`, `chname`, `url` ) VALUES (?, ?, ?, ?)';
@@ -109,7 +109,6 @@ $app->post('/changeStory',function(Request $request, Response $response){
   try{
     $setMinogashi = $minogashi == 'true'? 1: 0;
     require_once './password.php';
-    $pdo = new PDO('mysql:dbname=anime;host=localhost;charset=utf8mb4', $connect['user'], $connect['pass']);
     $update_query = 'update animeStory SET minogashi = ?, comment = ? WHERE tid = ? AND count = ?';
     $update = $pdo->prepare($update_query);
     $update->bindValue(1, $setMinogashi);
@@ -130,7 +129,6 @@ $app->post('/updateAnimeAbout',function(Request $request, Response $response){
   $response = $response->withHeader('Content-type', 'application/json');
   try{
     require_once './password.php';
-    $pdo = new PDO('mysql:dbname=anime;host=localhost;charset=utf8mb4', $connect['user'], $connect['pass']);
     $update_query = 'update anime SET hashTag = ?, characterURL = ? ,publicURL = ? WHERE tid = ?';
     $update = $pdo->prepare($update_query);
     $update->bindValue(1, $getBodys["hashTag"]);

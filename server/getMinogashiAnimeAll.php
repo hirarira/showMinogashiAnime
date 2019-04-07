@@ -1,7 +1,7 @@
 <?php
 try{
   require_once './password.php';
-  $pdo = new PDO('mysql:dbname=anime;host=localhost;charset=utf8mb4', $connect['user'], $connect['pass']);
+  
   $get_minogashi_query =
     'SELECT * FROM `animeStory` AS T1 JOIN `anime`
     AS T2 ON T1.tid = T2.tid
