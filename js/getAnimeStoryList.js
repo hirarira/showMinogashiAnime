@@ -52,6 +52,9 @@
           },(res)=>{
             this.changeResult = res;
           });
+        },
+        updateAnimeAbout: function(e){
+          console.log(this.hashTag);
         }
       }
     });
