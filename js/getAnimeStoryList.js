@@ -16,7 +16,10 @@
         review: null,
         loading: true,
         changeResult: null,
-        sb_url: null
+        sb_url: null,
+        hashTag: null,
+        publicURL: null,
+        characterURL: null
       },
       methods:{
         updateComment: function(){
@@ -103,6 +106,10 @@
           app.review = res[0];
           app.loading = false;
         });
+        // 基礎情報を入れていく
+        app.hashTag = app.anime[0].hashTag;
+        app.publicURL = app.anime[0].url.split('	')[0];
+        app.characterURL = app.anime[0].characterURL;
       })
       .fail((e)=>{
         app.error = e.toString();
