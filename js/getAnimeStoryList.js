@@ -17,6 +17,7 @@
         loading: true,
         changeResult: null,
         sb_url: null,
+        tid: null,
         hashTag: null,
         publicURL: null,
         characterURL: null
@@ -53,8 +54,16 @@
             this.changeResult = res;
           });
         },
+        // アニメ基本情報の更新をする
         updateAnimeAbout: function(e){
-          console.log(this.hashTag);
+          $.post("./server/server.php/updateAnimeAbout",{
+            tid: this.tid,
+            hashTag: this.hashTag,
+            characterURL: this.characterURL,
+            publicURL: this.publicURL
+          },(res)=>{
+            console.log(res);
+          });
         }
       }
     });
@@ -110,6 +119,7 @@
           app.loading = false;
         });
         // 基礎情報を入れていく
+        app.tid = app.anime[0].tid;
         app.hashTag = app.anime[0].hashTag;
         app.publicURL = app.anime[0].publicURL == "" ? app.anime[0].url.split('	')[0] : app.anime[0].publicURL;
         app.characterURL = app.anime[0].characterURL;

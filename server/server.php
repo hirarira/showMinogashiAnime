@@ -125,4 +125,25 @@ $app->post('/changeStory',function(Request $request, Response $response){
   return $response;
 });
 
+$app->post('/updateAnimeAbout',function(Request $request, Response $response){
+  $getBodys = $request->getParsedBody();
+  $response = $response->withHeader('Content-type', 'application/json');
+  try{
+    require_once './password.php';
+    $pdo = new PDO('mysql:dbname=anime;host=localhost;charset=utf8mb4', $connect['user'], $connect['pass']);
+    $update_query = 'update anime SET hashTag = ?, characterURL = ? ,publicURL = ? WHERE tid = ?';
+    $update = $pdo->prepare($update_query);
+    $update->bindValue(1, $getBodys["hashTag"]);
+    $update->bindValue(2, $getBodys["characterURL"]);
+    $update->bindValue(3, $getBodys["publicURL"]);
+    $update->bindValue(4, $getBodys["tid"]);
+    $update->execute();
+    $res = array("states"=>"ok");
+  } catch (PDOException $e) {
+    $res = array("states"=>"error");
+  }
+  $response->getBody()->write( json_encode($res) );
+  return $response;
+});
+
 $app->run();
