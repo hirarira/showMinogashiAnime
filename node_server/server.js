@@ -2,6 +2,7 @@
 const Express = require("express");
 const BodyParser = require('body-parser');
 const Sequelize = require('sequelize');
+const AnimeReview = require('./model/animeReview.js');
 const app = Express();
 
 const db = {
@@ -22,11 +23,7 @@ const sequelize = new Sequelize(db.name, db.user, db.pass, {
   dialect: db.dialect
 });
 
-// 接続確認用
-sequelize.authenticate()
-.then(()=>{
-  console.log("ok");
-});
+let animeReview = new AnimeReview(sequelize);
 
 // urlencodedとjsonは別々に初期化する
 app.use(BodyParser.urlencoded({
@@ -42,4 +39,16 @@ app.get("/test", (req, res)=>{
   res.header('Content-Type', 'application/json');
   let res_body = { status: 'ok' };
   res.send(res_body);
+});
+
+app.get("/getAnimeReview", (req, res)=>{
+  animeReview.model.findAll({
+    where: {
+      tid: 392
+    }
+  })
+  .then((res_body)=>{
+    res.header('Content-Type', 'application/json');
+    res.send(res_body);
+  })
 });
