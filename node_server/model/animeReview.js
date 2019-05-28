@@ -32,4 +32,14 @@ module.exports = class{
       timestamps: false
     });
   }
+  getAnimeReview(tid){
+    return this.model.findAll({
+      where: {
+        tid: tid
+      }
+    });
+  }
+  getAllAnimeReview(){
+    return this.model.findAll();
+  }
 }

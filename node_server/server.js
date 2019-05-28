@@ -3,27 +3,14 @@ const Express = require("express");
 const BodyParser = require('body-parser');
 const Sequelize = require('sequelize');
 const AnimeReview = require('./model/animeReview.js');
+const DBSetting = require('./model/dbSetting.js');
 const app = Express();
-
-const db = {
-  name: 'anime',
-  user: process.env.ANIME_DB_USER_NAME,
-  pass: process.env.ANIME_DB_PASS,
-  host: 'localhost',
-  dialect: 'mysql'
-};
-
-if(db.user == null || db.pass == null){
-  console.log("ENV:DB_UASENAME or DB_PASS is null");
-  return;
-}
-
-const sequelize = new Sequelize(db.name, db.user, db.pass, {
-  host: db.host,
-  dialect: db.dialect
-});
+const sequelize = DBSetting();
 
 let animeReview = new AnimeReview(sequelize);
+if(animeReview == null){
+  return;
+}
 
 // urlencodedとjsonは別々に初期化する
 app.use(BodyParser.urlencoded({
@@ -41,14 +28,37 @@ app.get("/test", (req, res)=>{
   res.send(res_body);
 });
 
-app.get("/getAnimeReview", (req, res)=>{
-  animeReview.model.findAll({
-    where: {
-      tid: 392
-    }
-  })
-  .then((res_body)=>{
+// レビューを1件返す
+app.get("/getAnimeReview/:tid", (req, res)=>{
+  animeReview.getAnimeReview(req.params.tid)
+  .then((db_data)=>{
     res.header('Content-Type', 'application/json');
+    let res_body = {
+      status: 'ok',
+      body: db_data
+    };
     res.send(res_body);
   })
+});
+
+app.get("/getAllAnimeReview", (req, res)=>{
+  animeReview.getAllAnimeReview()
+  .then((db_data)=>{
+    res.header('Content-Type', 'application/json');
+    let res_body = {
+      status: 'ok',
+      body: db_data
+    };
+    res.send(res_body);
+  })
+});
+
+// 404
+app.use(function(req, res, next) {
+  res.header('Content-Type', 'application/json');
+  let res_body = {
+    status: 'ng',
+    body: '404 not found'
+  };
+  res.status(404).send(res_body);
 });
