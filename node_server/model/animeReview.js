@@ -4,27 +4,27 @@ module.exports = class{
     this.model = sequelize.define('animeReview', {
       // フィールド名
       tid: {
-          // フィールドの型
-          type: Sequelize.INTEGER,
-          primaryKey: true
+        // フィールドの型
+        type: Sequelize.INTEGER,
+        primaryKey: true
       },
       watchDate: {
-          type: Sequelize.TEXT
+        type: Sequelize.TEXT
       },
       rate: {
-          type: Sequelize.INTEGER
+        type: Sequelize.INTEGER
       },
       airtime: {
-          type: Sequelize.INTEGER
+        type: Sequelize.INTEGER
       },
       comment: {
-          type: Sequelize.TEXT,
+        type: Sequelize.TEXT,
       },
       original: {
-          type: Sequelize.TEXT
+          ype: Sequelize.TEXT
       },
       genre: {
-          type: Sequelize.TEXT
+        type: Sequelize.TEXT
       },
     }, {
       // モデル名をそのままテーブル名として使う
