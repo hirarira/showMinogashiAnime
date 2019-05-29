@@ -8,24 +8,12 @@ module.exports = class{
         type: Sequelize.INTEGER,
         primaryKey: true
       },
-      title: {
-        type: Sequelize.TEXT
-      },
-      chName: {
-        type: Sequelize.STRING(50)
-      },
-      url: {
-        type: Sequelize.TEXT
-      },
-      hashTag: {
-        type: Sequelize.STRING(30)
-      },
-      characterURL: {
-        type: Sequelize.TEXT
-      },
-      publicURL: {
-        type: Sequelize.TEXT
-      }
+      title: Sequelize.TEXT,
+      chName: Sequelize.STRING,
+      url: Sequelize.TEXT,
+      hashTag: Sequelize.STRING,
+      characterURL: Sequelize.TEXT,
+      publicURL: Sequelize.TEXT
     }, {
       // モデル名をそのままテーブル名として使う
       freezeTableName: true,

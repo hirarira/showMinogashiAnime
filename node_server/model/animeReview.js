@@ -8,24 +8,12 @@ module.exports = class{
         type: Sequelize.INTEGER,
         primaryKey: true
       },
-      watchDate: {
-        type: Sequelize.TEXT
-      },
-      rate: {
-        type: Sequelize.INTEGER
-      },
-      airtime: {
-        type: Sequelize.INTEGER
-      },
-      comment: {
-        type: Sequelize.TEXT,
-      },
-      original: {
-          ype: Sequelize.TEXT
-      },
-      genre: {
-        type: Sequelize.TEXT
-      },
+      watchDate: Sequelize.TEXT,
+      rate: Sequelize.INTEGER,
+      airtime: Sequelize.INTEGER,
+      comment: Sequelize.TEXT,
+      original: Sequelize.TEXT,
+      genre: Sequelize.TEXT
     }, {
       // モデル名をそのままテーブル名として使う
       freezeTableName: true,
