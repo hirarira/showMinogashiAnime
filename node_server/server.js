@@ -3,11 +3,14 @@ const Express = require("express");
 const BodyParser = require('body-parser');
 const Sequelize = require('sequelize');
 const AnimeReview = require('./model/animeReview.js');
+const AnimeAbout = require('./model/anime.js');
 const DBSetting = require('./model/dbSetting.js');
 const app = Express();
 const sequelize = DBSetting();
 
 let animeReview = new AnimeReview(sequelize);
+let animeAbout = new AnimeAbout(sequelize);
+
 if(animeReview == null){
   return;
 }
@@ -30,12 +33,15 @@ app.get("/test", (req, res)=>{
 
 // レビューを1件返す
 app.get("/getAnimeReview/:tid", (req, res)=>{
-  animeReview.getAnimeReview(req.params.tid)
+  let animePromises = [];
+  animePromises.push( animeReview.getAnimeReview(req.params.tid) );
+  animePromises.push( animeAbout.getAnime(req.params.tid) );
+  Promise.all(animePromises)
   .then((db_data)=>{
     res.header('Content-Type', 'application/json');
     let res_body = {
       status: 'ok',
-      body: db_data
+      body: Object.assign(db_data[0][0].dataValues, db_data[1][0].dataValues)
     };
     res.send(res_body);
   })
