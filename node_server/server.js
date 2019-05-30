@@ -47,16 +47,31 @@ app.get("/getAnimeReview/:tid", (req, res)=>{
   })
 });
 
+// 全件のレビューを返す
 app.get("/getAllAnimeReview", (req, res)=>{
-  animeReview.getAllAnimeReview()
-  .then((db_data)=>{
+  let animePromises = [];
+  animePromises.push( animeReview.getAllAnimeReview() );
+  animePromises.push( animeAbout.getAllAnime() );
+  Promise.all(animePromises)
+  .then((db_datas)=>{
+    let animeList = [];
+    let animeReviewList = db_datas[0];
+    let animeAboutList = db_datas[1];
+    for(let i=0; i<animeAboutList.length; i++){
+      for(let j=0; j<animeReviewList.length; j++){
+        if(animeAboutList[i].tid == animeReviewList[j].tid){
+          animeList.push( Object.assign(animeAboutList[i].dataValues, animeReviewList[j].dataValues) );
+          break;
+        }
+      }
+    }
     res.header('Content-Type', 'application/json');
     let res_body = {
       status: 'ok',
-      body: db_data
+      body: animeList
     };
     res.send(res_body);
-  })
+  });
 });
 
 // 404
