@@ -4,12 +4,14 @@ const BodyParser = require('body-parser');
 const Sequelize = require('sequelize');
 const AnimeReview = require('./model/animeReview.js');
 const AnimeAbout = require('./model/anime.js');
+const AnimeStory = require('./model/animeStory.js');
 const DBSetting = require('./model/dbSetting.js');
 const app = Express();
 const sequelize = DBSetting();
 
 let animeReview = new AnimeReview(sequelize);
 let animeAbout = new AnimeAbout(sequelize);
+let animeStory = new AnimeStory(sequelize);
 
 if(animeReview == null){
   return;
@@ -31,6 +33,24 @@ app.get("/test", (req, res)=>{
   res.send(res_body);
 });
 
+app.get("/getAnimeStoryList/:tid", (req, res)=>{
+  let animePromises = [];
+  animePromises.push( animeAbout.getAnime(req.params.tid) );
+  animePromises.push( animeStory.getAllAnimeStory(req.params.tid) );
+  Promise.all(animePromises)
+  .then((db_data)=>{
+    res.header('Content-Type', 'application/json');
+    let res_body = {
+      status: 'ok',
+      body: {
+        about: db_data[0][0],
+        story: db_data[1]
+      }
+    };
+    res.send(res_body);
+  });
+});
+
 // レビューを1件返す
 app.get("/getAnimeReview/:tid", (req, res)=>{
   let animePromises = [];
@@ -44,7 +64,7 @@ app.get("/getAnimeReview/:tid", (req, res)=>{
       body: Object.assign(db_data[0][0].dataValues, db_data[1][0].dataValues)
     };
     res.send(res_body);
-  })
+  });
 });
 
 // 全件のレビューを返す
