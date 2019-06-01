@@ -6,6 +6,7 @@ const AnimeReview = require('./model/animeReview.js');
 const AnimeAbout = require('./model/anime.js');
 const AnimeStory = require('./model/animeStory.js');
 const DBSetting = require('./model/dbSetting.js');
+let moment = require('moment');
 const app = Express();
 const sequelize = DBSetting();
 
@@ -89,6 +90,41 @@ app.get("/getAllAnimeReview", (req, res)=>{
     let res_body = {
       status: 'ok',
       body: animeList
+    };
+    res.send(res_body);
+  });
+});
+
+// 全ての見逃しアニメ情報を取得
+app.get("/getAllMinogashiAnime", (req, res)=>{
+  let minogashiAnimeListData;
+  animeStory.getAllMinogashiStory()
+  .then((minogashiList)=>{
+    let tidList = [];
+    for(let i=0; i<minogashiList.length; i++){
+      if( tidList.indexOf(minogashiList[i].tid) == -1 ){
+        tidList.push(minogashiList[i].tid);
+      }
+    }
+    minogashiAnimeListData = minogashiList;
+    return animeAbout.getAnimeList(tidList);
+  })
+  .then((animeList)=>{
+    let minogashiAnimeList = [];
+    for(let i=0; i<minogashiAnimeListData.length; i++){
+      for(let j=0; j<animeList.length; j++){
+        if(minogashiAnimeListData[i].tid == animeList[j].tid){
+          minogashiAnimeList.push(
+             Object.assign(minogashiAnimeListData[i].dataValues, animeList[j].dataValues)
+          );
+          break;
+        }
+      }
+    }
+    res.header('Content-Type', 'application/json');
+    let res_body = {
+      status: 'ok',
+      body: minogashiAnimeList
     };
     res.send(res_body);
   });
