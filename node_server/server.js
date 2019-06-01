@@ -95,6 +95,22 @@ app.get("/getAllAnimeReview", (req, res)=>{
   });
 });
 
+// アニメ情報とアニメ各話情報の結合
+function assignAnimeAboutAndStory(about, story){
+  let minogashiAnimeList = [];
+  for(let i=0; i<story.length; i++){
+    for(let j=0; j<about.length; j++){
+      if(story[i].tid == about[j].tid){
+        minogashiAnimeList.push(
+           Object.assign(story[i].dataValues, about[j].dataValues)
+        );
+        break;
+      }
+    }
+  }
+  return minogashiAnimeList;
+}
+
 // 全ての見逃しアニメ情報を取得
 app.get("/getAllMinogashiAnime", (req, res)=>{
   let minogashiAnimeListData;
@@ -110,17 +126,33 @@ app.get("/getAllMinogashiAnime", (req, res)=>{
     return animeAbout.getAnimeList(tidList);
   })
   .then((animeList)=>{
-    let minogashiAnimeList = [];
-    for(let i=0; i<minogashiAnimeListData.length; i++){
-      for(let j=0; j<animeList.length; j++){
-        if(minogashiAnimeListData[i].tid == animeList[j].tid){
-          minogashiAnimeList.push(
-             Object.assign(minogashiAnimeListData[i].dataValues, animeList[j].dataValues)
-          );
-          break;
-        }
+    let minogashiAnimeList = assignAnimeAboutAndStory(animeList, minogashiAnimeListData);
+    res.header('Content-Type', 'application/json');
+    let res_body = {
+      status: 'ok',
+      body: minogashiAnimeList
+    };
+    res.send(res_body);
+  });
+});
+
+// 過去一週間の見逃しアニメ情報を取得
+app.get("/getWeekMinogashiAnime", (req, res)=>{
+  let minogashiAnimeListData;
+  let lastWeek = moment().subtract(7, 'days').startOf('day');
+  animeStory.getWeekMinogashiAnime(lastWeek)
+  .then((minogashiList)=>{
+    let tidList = [];
+    for(let i=0; i<minogashiList.length; i++){
+      if( tidList.indexOf(minogashiList[i].tid) == -1 ){
+        tidList.push(minogashiList[i].tid);
       }
     }
+    minogashiAnimeListData = minogashiList;
+    return animeAbout.getAnimeList(tidList);
+  })
+  .then((animeList)=>{
+    let minogashiAnimeList = assignAnimeAboutAndStory(animeList, minogashiAnimeListData);
     res.header('Content-Type', 'application/json');
     let res_body = {
       status: 'ok',

@@ -27,6 +27,13 @@ module.exports = class{
       }
     });
   }
+  getAnimeList(tidList){
+    return this.model.findAll({
+      where: {
+        tid: tidList
+      }
+    });
+  }
   getAllAnime(){
     return this.model.findAll();
   }

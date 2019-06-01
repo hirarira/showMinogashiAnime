@@ -1,6 +1,8 @@
 module.exports = class{
   constructor(sequelize) {
     const Sequelize = require('sequelize');
+    this.moment = require('moment');
+    this.sequelize = Sequelize;
     this.model = sequelize.define('animeStory', {
       // フィールド名
       id: {
@@ -36,11 +38,24 @@ module.exports = class{
   getAllMinogashiStory(){
     return this.model.findAll({
       where: {
-        minogashi: 0
+        minogashi: 0,
+        StTime: {
+          [this.sequelize.Op.lte]: this.moment().unix()
+        }
       }
     });
   }
-  getWeekMinogashiAnime(){
-
+  getWeekMinogashiAnime(start){
+    return this.model.findAll({
+      where: {
+        minogashi: 0,
+        StTime: {
+          [this.sequelize.Op.between]: [
+            start.unix(),
+            this.moment().unix()
+          ]
+        }
+      }
+    });
   }
 }
