@@ -26,7 +26,11 @@ module.exports = class{
     return this.model.findAll({
       where: {
         tid: tid
-      }
+      },
+      // 話数順にソート
+      order: [
+        ['count', 'ASC']
+      ]
     });
   }
   getAllMinogashiStory(){
