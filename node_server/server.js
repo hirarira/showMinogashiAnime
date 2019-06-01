@@ -18,6 +18,22 @@ if(animeReview == null){
   return;
 }
 
+// アニメ情報とアニメ各話情報の結合
+function assignAnimeAboutAndStory(about, story){
+  let minogashiAnimeList = [];
+  for(let i=0; i<story.length; i++){
+    for(let j=0; j<about.length; j++){
+      if(story[i].tid == about[j].tid){
+        minogashiAnimeList.push(
+           Object.assign(story[i].dataValues, about[j].dataValues)
+        );
+        break;
+      }
+    }
+  }
+  return minogashiAnimeList;
+}
+
 // urlencodedとjsonは別々に初期化する
 app.use(BodyParser.urlencoded({
     extended: true
@@ -34,6 +50,7 @@ app.get("/test", (req, res)=>{
   res.send(res_body);
 });
 
+// アニメの全話数情報を取得
 app.get("/getAnimeStoryList/:tid", (req, res)=>{
   let animePromises = [];
   animePromises.push( animeAbout.getAnime(req.params.tid) );
@@ -50,6 +67,16 @@ app.get("/getAnimeStoryList/:tid", (req, res)=>{
     };
     res.send(res_body);
   });
+});
+
+// アニメの話数情報を更新
+app.post("/setAnimeStory",(req, res)=>{
+  let options = {
+    tid: req.body.tid,
+    count: req.body.count,
+    minogashi: req.body.minogashi,
+    comment: req.body.comment
+  };
 });
 
 // レビューを1件返す
@@ -94,22 +121,6 @@ app.get("/getAllAnimeReview", (req, res)=>{
     res.send(res_body);
   });
 });
-
-// アニメ情報とアニメ各話情報の結合
-function assignAnimeAboutAndStory(about, story){
-  let minogashiAnimeList = [];
-  for(let i=0; i<story.length; i++){
-    for(let j=0; j<about.length; j++){
-      if(story[i].tid == about[j].tid){
-        minogashiAnimeList.push(
-           Object.assign(story[i].dataValues, about[j].dataValues)
-        );
-        break;
-      }
-    }
-  }
-  return minogashiAnimeList;
-}
 
 // 全ての見逃しアニメ情報を取得
 app.get("/getAllMinogashiAnime", (req, res)=>{
