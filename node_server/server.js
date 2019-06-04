@@ -13,6 +13,12 @@ let server = app.listen(3333, function(){
     console.log("Node.js is listening to PORT:" + server.address().port);
 });
 
+// 静的ファイルを公開
+app.use("/", Express.static(__dirname  + '/client/html'));
+app.use("/bootstrap", Express.static(__dirname  + '/client/bootstrap'));
+app.use("/css", Express.static(__dirname  + '/client/css'));
+app.use("/js", Express.static(__dirname  + '/client/js'));
+
 let api = require('./api/api.js');
 app.use('/api', api);
 
