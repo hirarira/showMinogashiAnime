@@ -2,13 +2,13 @@ class AnimeDataDB{
   constructor(id, in_set){
     this.id = id;
     this.youbi = ["日","月","火","水","木","金","土"];
-    this.startTime = new Date(in_set.StTime*1000);
-    this.endTime = new Date(in_set.EdTime*1000);
+    this.startTime = new Date(in_set.stTime*1000);
+    this.endTime = new Date(in_set.edTime*1000);
     this.title = in_set.title;
-    this.count = in_set.Count;
-    this.channel = in_set.ChName;
-    this.channelID = in_set.ChID;
-    this.subTitle = in_set.SubTitle;
+    this.count = in_set.count;
+    this.channel = in_set.chName;
+    // this.channelID = in_set.ChID;
+    this.subTitle = in_set.subTitle;
     if(this.subTitle === ''　|| this.subTitle === null){
       this.subTitle = '(サブタイなし)';
     }
@@ -18,12 +18,13 @@ class AnimeDataDB{
     this.url = in_set.url;
     this.characterURL = in_set.characterURL;
     this.topUrl = this.url.split("\t")[0];
-    this.minogashi_sb = (in_set.UPSFlag==1);
-    this.tid = in_set.TID;
+    // this.minogashi_sb = (in_set.UPSFlag==1);
+    this.tid = in_set.tid;
     this.subtitleListUrl = "http://cal.syoboi.jp/tid/"+this.tid+"/subtitle";
     this.commentURL = "./setComment.html?tid="+this.tid+"&count="+this.count;
     this.animeListURL = "showAnimeStoryList.html?tid="+this.tid;
     this.setCountDown();
+    console.log(this);
   }
   showInfo(){
     let outstr = "タイトル："+this.title+"\n";

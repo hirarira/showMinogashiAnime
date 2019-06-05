@@ -36,12 +36,13 @@
    * https://sites.google.com/site/syobocal/spec/rss2-php
    *
    */
-  let in_url = "./server/getMinogashiAnimeAll.php";
-  $.get(in_url,(importAnimeSet)=>{
+  let in_url = "./api/getAllMinogashiAnime";
+  $.get(in_url, (response)=>{
+    let importAnimeSet = response['body'];
     let AnimeDataSet = [];
     let count = 0;
-    for(let i=0;i<importAnimeSet.length;i++){
-      console.log(importAnimeSet[i]);
+    for(let i=0; i<importAnimeSet.length; i++){
+      // console.log(importAnimeSet[i]);
       minogashiAnimeList.push(new AnimeDataDB(i, importAnimeSet[i]));
     }
   });
