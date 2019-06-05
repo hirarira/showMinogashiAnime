@@ -17,6 +17,7 @@ class AnimeDataDB{
     this.comment = in_set.comment;
     this.url = in_set.url;
     this.characterURL = in_set.characterURL;
+    console.log(this.url.split("\t"));
     this.topUrl = this.url.split("\t")[0];
     // this.minogashi_sb = (in_set.UPSFlag==1);
     this.tid = in_set.tid;

@@ -34,34 +34,20 @@
   /*
    * しょぼカレ仕様
    * https://sites.google.com/site/syobocal/spec/rss2-php
-   *
    */
-  // 今日の日付
-  let endDate = new Date();
-  let endDateFormat = date_format(endDate);
-  // 開始時日付
-  let startDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() - 7,
-    endDate.getHours(), endDate.getMinutes());
-  let startDateFormat = date_format(startDate);
   // UPSFlag
-  let in_url = "./server/server.php/getShoboi";
+  let in_url = "./api/getWeekMinogashiAnime";
   console.log(in_url);
   $.get(in_url,{
     filter: 1,
     alt: "json",
-    usr: userName,
-    start: startDateFormat,
-    end: endDateFormat
-  },(importAnimeSet)=>{
+    usr: userName
+  },(response)=>{
+    let importAnimeSet = response['body'];
     let AnimeDataSet = [];
     let count = 0;
-    for(let i=0;i<importAnimeSet.items.length;i++){
-      AnimeDataSet[i] = new AnimeData(i, importAnimeSet.items[i]);
-      if(!AnimeDataSet[i].getMinogashi() ){
-        let nowPushAnime = AnimeDataSet[i];
-        nowPushAnime["id"] = count++;
-        minogashiAnimeList.push( nowPushAnime );
-      }
+    for(let i=0; i<importAnimeSet.length; i++){
+      minogashiAnimeList.push(new AnimeDataDB(i, importAnimeSet[i]));
     }
   });
 })();
