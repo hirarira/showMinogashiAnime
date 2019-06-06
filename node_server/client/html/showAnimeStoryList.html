@@ -45,18 +45,18 @@
     </nav>
     <!-- メニューここまで -->
     <div id="app">
-      <h1 class="text-center" v-if="anime">{{anime[0].title}}:各話リスト</h1>
+      <h1 class="text-center" v-if="anime">{{anime['about'].title}}:各話リスト</h1>
       <h2 class="text-center"> {{error}} </h2>
       <div v-if="anime">
         <table class="table table-hover table-bordered">
           <tbody>
             <tr>
               <td> タイトル </td>
-              <td> {{anime[0].title}} </td>
+              <td> {{anime['about'].title}} </td>
             </tr>
             <tr>
               <td> 放送局 </td>
-              <td> {{anime[0].chName}} </td>
+              <td> {{anime['about'].chName}} </td>
             </tr>
             <tr>
               <td> hashTag </td>
@@ -87,9 +87,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="story in anime" v-bind:class="{ 'table-danger': story.minogashi == 0 }">
-              <td> {{story.Count}} </td>
-              <td> <a v-bind:href="story.commentURL" class="btn-link">{{story.SubTitle}}</a> </td>
+            <tr v-for="story of anime['story']" v-bind:class="{ 'table-danger': story.minogashi == 0 }">
+              <td> {{story.count}} </td>
+              <td> <a v-bind:href="story.commentURL" class="btn-link">{{story.subTitle}}</a> </td>
               <td class="text-nowrap d-none d-sm-table-cell"> {{story.startTime.getMonth()+1}} / {{story.startTime.getDate()}}</td>
               <td class="d-none d-sm-table-cell"> {{story.comment}} </td>
               <td class="text-nowrap"> <button v-on:click="changeMinogashi(story)" class="btn-success">見逃し</a> </td>

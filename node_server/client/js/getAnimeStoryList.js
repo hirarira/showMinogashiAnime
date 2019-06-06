@@ -81,29 +81,22 @@
       app.sb_url = "http://cal.syoboi.jp/tid/" + params.tid;
       // Ajaxで該当するのを取得
       $.ajax({
-        type: 'POST',
-        url: "./server/getAnimeList.php",
-        data: {
-          tid: params.tid
-        },
+        type: 'GET',
+        url: "./api/getAnimeStoryList/"+params.tid,
         dataType: 'json'
       })
       .done((res)=>{
-        if(res.length === 0){
+        console.log(res['status']);
+        if( res['status'] !== 'ok' ){
           app.error = "該当するアニメがありません。";
           return;
         }
-        app.anime = res;
-        app.anime.sort((a,b)=>{
-          if( Number(a.Count) < Number(b.Count) ) return -1;
-          if( Number(a.Count) > Number(b.Count) ) return 1;
-          return 0;
-        });
-        for(let i=0; i<app.anime.length; i++){
-          app.anime[i].commentURL = "./setComment.html?tid="+app.anime[i].TID+"&count="+app.anime[i].Count;
-          app.anime[i].startTime = new Date(Number(app.anime[i].StTime * 1000));
-          if(app.anime[i].SubTitle === ''　|| app.anime[i].SubTitle === null){
-            app.anime[i].SubTitle = '(サブタイなし)';
+        app.anime = res['body'];
+        for(let i=0; i<app.anime['story'].length; i++){
+          app.anime['story'][i].commentURL = "./setComment.html?tid="+app.anime['story'][i].tid+"&count="+app.anime['story'][i].count;
+          app.anime['story'][i].startTime = new Date(Number(app.anime['story'][i].stTime * 1000));
+          if(app.anime['story'][i].subTitle === ''　|| app.anime['story'][i].subTitle === null){
+            app.anime['story'][i].subTitle = '(サブタイなし)';
           }
         }
         $.ajax({
@@ -119,10 +112,10 @@
           app.loading = false;
         });
         // 基礎情報を入れていく
-        app.tid = app.anime[0].tid;
-        app.hashTag = app.anime[0].hashTag;
-        app.publicURL = app.anime[0].publicURL == "" ? app.anime[0].url.split('	')[0] : app.anime[0].publicURL;
-        app.characterURL = app.anime[0].characterURL;
+        app.tid = app.anime['about'].tid;
+        app.hashTag = app.anime['about'].hashTag;
+        app.publicURL = app.anime['about'].publicURL == "" ? app.anime['about'].url.split('	')['about'] : app.anime['about'].publicURL;
+        app.characterURL = app.anime['about'].characterURL;
       })
       .fail((e)=>{
         app.error = e.toString();
