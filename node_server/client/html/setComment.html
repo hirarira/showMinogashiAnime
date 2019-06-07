@@ -45,52 +45,52 @@
     </nav>
     <!-- メニューここまで -->
     <div id="app">
-      <h1 class="text-center" v-if="anime">{{anime.title}}:第{{anime.Count}}話のコメント追加</h1>
+      <h1 class="text-center" v-if="anime">{{anime.about.title}}:第{{story.count}}話のコメント追加</h1>
       <h2 class="text-center"> {{error}} </h2>
       <div v-if="anime">
         <table class="table table-hover table-bordered">
           <tbody>
             <tr>
               <td> タイトル </td>
-              <td> <a v-bind:href="anime.animeListURL" class="btn-link">{{anime.title}}</a> </td>
+              <td> <a v-bind:href="anime.animeListURL" class="btn-link">{{anime.about.title}}</a> </td>
             </tr>
             <tr>
               <td> サブタイトル </td>
-              <td> {{anime.SubTitle}} </td>
+              <td> {{story.subTitle}} </td>
             </tr>
             <tr>
               <td> 回数 </td>
-              <td> {{anime.Count}} </td>
+              <td> {{story.count}} </td>
             </tr>
             <tr>
               <td> 放送局 </td>
-              <td> {{anime.chName}} </td>
+              <td> {{anime.about.chName}} </td>
             </tr>
             <tr>
               <td> URL </td>
-              <td> <a v-bind:href="anime.url.split('	')[0]">公式サイト</a> </td>
+              <td> <a v-bind:href="anime.about.url.split('	')[0]">公式サイト</a> </td>
             </tr>
             <tr>
               <td> Character </td>
-              <td> <a v-bind:href="anime.characterURL">Character</a> </td>
+              <td> <a v-bind:href="anime.about.characterURL">Character</a> </td>
             </tr>
             <tr>
               <td> 放送日 </td>
-              <td> {{ new Date(Number(anime.StTime) * 1000) }} </td>
+              <td> {{ new Date(Number(story.stTime) * 1000) }} </td>
             </tr>
             <tr>
               <td> 見逃し </td>
-              <td> {{anime.minogashi}} </td>
+              <td> {{story.minogashi}} </td>
             </tr>
             <tr>
               <td> コメント </td>
-              <td> {{anime.comment}} </td>
+              <td> {{story.comment}} </td>
             </tr>
           </tbody>
         </table>
         <div class="form-group">
           <label for="exampleFormControlTextarea1">コメントの編集</label>
-          <textarea class="form-control" id="animeComment" rows="3" v-model="message">{{anime.comment}}</textarea>
+          <textarea class="form-control" id="animeComment" rows="3" v-model="message">{{story.comment}}</textarea>
           <button class="btn btn-primary" v-on:click="updateComment()">送信する</button>
         </div>
       </div>

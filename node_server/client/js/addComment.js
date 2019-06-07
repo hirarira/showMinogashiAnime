@@ -11,6 +11,7 @@
         params: params,
         error: null,
         anime: null,
+        story: null,
         message: null,
         showComment: null
       },
@@ -42,23 +43,20 @@
       }
       // Ajaxで該当するのを取得
       $.ajax({
-        type: 'POST',
-        url: "./server/getAnime.php",
-        data: {
-          tid: params.tid,
-          count: params.count
-        },
+        type: 'GET',
+        url: "./api/getAnimeStoryList/"+params.tid,
         dataType: 'json'
       })
       .done((res)=>{
-        if(res.length === 0){
+        if(res['status'] != 'ok'){
           app.error = "該当するアニメがありません。";
           return;
         }
-        app.anime = res[0];
-        app.message = app.anime.comment;
-        app.showComment = app.anime.comment.replace("\n", "\r\n");
-        app.anime.animeListURL = "./showAnimeStoryList.html?tid="+app.anime.TID;
+        app.anime = res['body'];
+        app.story = app.anime['story'][params.count-1];
+        app.message = app.story.comment;
+        app.story.showComment = app.story.comment.replace("\n", "\r\n");
+        app.anime.animeListURL = "./showAnimeStoryList.html?tid="+app.anime['about'].tid;
       })
       .fail((e)=>{
         app.error = e.toString();
