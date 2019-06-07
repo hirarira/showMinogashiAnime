@@ -101,14 +101,11 @@
         }
         $.ajax({
           type: 'GET',
-          url: "./server/getAnimeReview.php",
-          data: {
-            tid: params.tid
-          },
+          url: "./api/getAnimeReview/"+params.tid,
           dataType: 'json'
         })
         .then((res)=>{
-          app.review = res[0];
+          app.review = res['body'];
           app.loading = false;
         });
         // 基礎情報を入れていく
