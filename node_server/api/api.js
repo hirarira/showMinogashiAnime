@@ -9,6 +9,7 @@ const DBSetting = require('./model/dbSetting.js');
 
 const sequelize = DBSetting();
 let moment = require('moment');
+let request_promise = require('request-promise');
 let animeReview = new AnimeReview(sequelize);
 let animeAbout = new AnimeAbout(sequelize);
 let animeStory = new AnimeStory(sequelize);
@@ -36,6 +37,28 @@ function assignAnimeAboutAndStory(about, story){
 router.use(function timeLog (req, res, next) {
   console.log('Time: ', Date.now())
   next();
+});
+
+// しょぼいカレンダーより任意の日付の見るアニメを取得
+router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
+  const shoboiHost = "http://cal.syoboi.jp/";
+  const accessURL = shoboiHost + "rss2.php";
+  let options = {
+    filter: req.query.filter,
+    alt: req.query.alt,
+    usr: req.query.usr,
+    start: req.query.start,
+    end: req.query.end
+  }
+  request_promise.get({
+    url: accessURL,
+    qs: options
+  })
+  .then((response)=>{
+    // TODO: DB保存処理を加える
+    res.header('Content-Type', 'application/json');
+    res.send(response);
+  });
 });
 
 // アニメの全話数情報を取得

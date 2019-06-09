@@ -36,9 +36,8 @@
    *
    */
   // UPSFlag
-  let in_url = "./server/server.php/getShoboi";
-  console.log(in_url);
-  $.get(in_url,{
+  let in_url = "./api/getShoboiAnimeAnyDay";
+  $.get(in_url, {
     filter: 1,
     alt: "json",
     usr: userName,
