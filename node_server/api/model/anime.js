@@ -37,4 +37,15 @@ module.exports = class{
   getAllAnime(){
     return this.model.findAll();
   }
+  updateAnimeAbout(options){
+    return this.model.update({
+      hashTag: options.hashTag,
+      characterURL: options.characterURL,
+      publicURL: options.publicURL
+    },{
+      where: {
+        tid: options.tid
+      }
+    });
+  }
 }

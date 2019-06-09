@@ -57,7 +57,7 @@
         },
         // アニメ基本情報の更新をする
         updateAnimeAbout: function(e){
-          $.post("./server/server.php/updateAnimeAbout",{
+          $.post("./api/setAnimeAbout",{
             tid: this.tid,
             hashTag: this.hashTag,
             characterURL: this.characterURL,

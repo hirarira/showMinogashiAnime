@@ -90,7 +90,34 @@ router.post("/setAnimeReview", (req, res)=>{
     rate: req.body.rate,
     comment: req.body.comment
   };
+  res.header('Content-Type', 'application/json');
   animeReview.updateReview(options)
+  .then((response)=>{
+    let res_body = {
+      status: 'ok',
+      date: moment()
+    };
+    res.send(res_body);
+  })
+  .catch((e)=>{
+    let res_body = {
+      status: 'ng',
+      date: moment()
+    };
+    res.send(res_body);
+  });
+});
+
+// アニメの概要を更新
+router.post("/setAnimeAbout", (req, res)=>{
+  let options = {
+    tid: req.body.tid,
+    hashTag: req.body.hashTag,
+    characterURL: req.body.characterURL,
+    publicURL: req.body.publicURL
+  };
+  res.header('Content-Type', 'application/json');
+  animeAbout.updateAnimeAbout(options)
   .then((response)=>{
     let res_body = {
       status: 'ok',
