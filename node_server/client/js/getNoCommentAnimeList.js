@@ -44,7 +44,7 @@
     endDate.getHours(), endDate.getMinutes());
   let startDateFormat = date_format(startDate);
   // UPSFlag
-  let in_url = "./server/server.php/getShoboi";
+  let in_url = "./api/getShoboiAnimeAnyDay";
   console.log(in_url);
   $.get(in_url,{
     filter: 1,
