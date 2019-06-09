@@ -17,13 +17,13 @@
       },
       methods:{
         updateComment: function(){
-          $.post("./server/server.php/changeStory",{
-            tid: this.anime.tid,
-            count: this.anime.Count,
-            minogashi: this.anime.minogashi == 0 ? 'false': 'true',
+          $.post("./api/setAnimeStory",{
+            tid: this.anime.about.tid,
+            count: this.story.count,
+            minogashi: this.story.minogashi == 0 ? 'false': 'true',
             comment: this.message
           },(res)=>{
-            this.anime.comment = this.message;
+            this.story.comment = this.message;
           });
         }
       }

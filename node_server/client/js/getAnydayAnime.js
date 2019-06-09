@@ -86,7 +86,7 @@
         },
         changeMinogashi: function(e){
           e.minogashi = !e.minogashi;
-          $.post("./server/server.php/changeStory",{
+          $.post("./api/setAnimeStory",{
             tid: e.tid,
             count: e.count,
             minogashi: e.minogashi,

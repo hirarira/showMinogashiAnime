@@ -58,4 +58,16 @@ module.exports = class{
       }
     });
   }
+  setAnimeStory(options){
+    console.log(options);
+    return this.model.update({
+      minogashi: options.minogashi,
+      comment: options.comment
+    },{
+      where: {
+        tid: options.tid,
+        count: options.count
+      }
+    });
+  }
 }

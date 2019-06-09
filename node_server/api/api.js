@@ -65,6 +65,20 @@ router.post("/setAnimeStory",(req, res)=>{
     minogashi: req.body.minogashi,
     comment: req.body.comment
   };
+  res.header('Content-Type', 'application/json');
+  animeStory.setAnimeStory(options)
+  .then((response)=>{
+    let res_body = {
+      status: 'ok'
+    };
+    res.send(res_body);
+  })
+  .catch((e)=>{
+    let res_body = {
+      status: 'ng'
+    };
+    res.send(res_body);
+  });
 });
 
 // レビューを1件返す

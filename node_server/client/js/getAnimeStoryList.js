@@ -24,23 +24,24 @@
       },
       methods:{
         updateComment: function(){
-          $.post("./server/server.php/changeStory",{
-            tid: this.anime.tid,
-            count: this.anime.Count,
-            minogashi: this.anime.minogashi == 0 ? 'false': 'true',
+          $.post("./api/setAnimeStory",{
+            tid: this.anime.about.tid,
+            count: this.anime.count,
+            minogashi: this.anime.minogashi == 0? 1: 0,
             comment: this.message
           },(res)=>{
             this.anime.comment = this.message;
           });
         },
         changeMinogashi: function(e){
-          e.minogashi = e.minogashi == 0?1:0;
-          $.post("./server/server.php/changeStory",{
-            tid: e.TID,
-            count: e.Count,
-            minogashi: e.minogashi == 0?'false':'true',
+          e.minogashi = e.minogashi == 0? 1: 0;
+          $.post("./api/setAnimeStory",{
+            tid: e.tid,
+            count: e.count,
+            minogashi: e.minogashi,
             comment: e.comment
-          },(res)=>{
+          })
+          .done((res)=>{
             console.log(res);
           });
         },
