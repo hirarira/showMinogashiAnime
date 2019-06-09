@@ -43,6 +43,7 @@ router.use(function timeLog (req, res, next) {
 router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
   const shoboiHost = "http://cal.syoboi.jp/";
   const accessURL = shoboiHost + "rss2.php";
+  let animeList;
   let options = {
     filter: req.query.filter,
     alt: req.query.alt,
@@ -55,9 +56,43 @@ router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
     qs: options
   })
   .then((response)=>{
-    // TODO: DB保存処理を加える
+    animeList = JSON.parse(response);
+    // アニメのTID_LISTを取得
+    let tidlist = [];
+    for(let i=0; i<animeList['items'].length; i++){
+      tidlist.push(animeList['items'][i].TID);
+    }
+    return animeAbout.getAnimeList(tidlist);
+  })
+  .then((response)=>{
+    for(let i=0; i<animeList['items'].length; i++){
+      let match = null;
+      for(let j=0; j<response.length; j++){
+        if(animeList['items'][i]['TID'] == response[j]['tid']){
+          match = j;
+          break;
+        }
+      }
+      // アニメの概要がなければDBに登録
+      if(match === null){
+        let options = {
+          tid: animeList['items'][i]['TID'],
+          title: animeList['items'][i]['Title'],
+          chName: animeList['items'][i]['ChName'],
+          url: animeList['items'][i]['Urls']
+        }
+        // TODO: ここで正常に挿入できたかPromiseの結果を見たい
+        animeAbout.insertAnimeAbout(options);
+      }
+      // アニメの概要があればDBの情報とマージ
+      else{
+        animeList['items'][i]['hashTag'] = response[match]['hashTag'];
+        animeList['items'][i]['characterURL'] = response[match]['characterURL'];
+      }
+    }
+    // TODO: アニメ見逃し情報の取得
     res.header('Content-Type', 'application/json');
-    res.send(response);
+    res.send(animeList);
   });
 });
 

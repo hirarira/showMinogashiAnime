@@ -37,6 +37,14 @@ module.exports = class{
   getAllAnime(){
     return this.model.findAll();
   }
+  insertAnimeAbout(options){
+    return this.model.create({
+      tid: options.tid,
+      title: options.title,
+      chName: options.chName,
+      url: options.url
+    });
+  }
   updateAnimeAbout(options){
     return this.model.update({
       hashTag: options.hashTag,
