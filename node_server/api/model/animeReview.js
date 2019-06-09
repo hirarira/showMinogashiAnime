@@ -30,4 +30,14 @@ module.exports = class{
   getAllAnimeReview(){
     return this.model.findAll();
   }
+  updateReview(options){
+    return this.model.update({
+      rate: options.rate,
+      comment: options.comment
+    },{
+      where: {
+        tid: options.tid
+      }
+    });
+  }
 }

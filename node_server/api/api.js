@@ -69,13 +69,39 @@ router.post("/setAnimeStory",(req, res)=>{
   animeStory.setAnimeStory(options)
   .then((response)=>{
     let res_body = {
-      status: 'ok'
+      status: 'ok',
+      date: moment()
     };
     res.send(res_body);
   })
   .catch((e)=>{
     let res_body = {
-      status: 'ng'
+      status: 'ng',
+      date: moment()
+    };
+    res.send(res_body);
+  });
+});
+
+// アニメのレビューを更新
+router.post("/setAnimeReview", (req, res)=>{
+  let options = {
+    tid: req.body.tid,
+    rate: req.body.rate,
+    comment: req.body.comment
+  };
+  animeReview.updateReview(options)
+  .then((response)=>{
+    let res_body = {
+      status: 'ok',
+      date: moment()
+    };
+    res.send(res_body);
+  })
+  .catch((e)=>{
+    let res_body = {
+      status: 'ng',
+      date: moment()
     };
     res.send(res_body);
   });

@@ -127,12 +127,14 @@
           </tbody>
         </table>
         <div class="form-group" v-if="review">
+          <!--
           <label>話数の編集</label>
-          <input type="text" class="form-control" v-model="review.話数">
+          <input type="text" class="form-control" v-model="review.number">
+          -->
           <label>評価の編集</label>
-          <input type="text" class="form-control" v-model="review.評価">
+          <input type="text" class="form-control" v-model="review.rate">
           <label>コメントの編集</label>
-          <textarea class="form-control" rows="3" v-model="review.コメント"></textarea>
+          <textarea class="form-control" rows="3" v-model="review.comment"></textarea>
           <button class="btn btn-primary" v-on:click="updateReview()">送信する</button>
         </div>
       </div>

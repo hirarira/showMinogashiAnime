@@ -46,11 +46,11 @@
           });
         },
         updateReview: function(){
-          $.post("./server/postAnimeReview.php",{
-            tid: this.review.TID,
-            rank: this.review.評価,
-            number: this.review.話数,
-            comment: this.review.コメント
+          $.post("./api/setAnimeReview",{
+            tid: this.review.tid,
+            rate: this.review.rate,
+            number: this.review.number,
+            comment: this.review.comment
           },(res)=>{
             this.changeResult = res;
           });
