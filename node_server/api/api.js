@@ -136,15 +136,28 @@ router.post("/setAnimeAbout", (req, res)=>{
 
 // レビューを1件返す
 router.get("/getAnimeReview/:tid", (req, res)=>{
+  res.header('Content-Type', 'application/json');
   let animePromises = [];
   animePromises.push( animeReview.getAnimeReview(req.params.tid) );
   animePromises.push( animeAbout.getAnime(req.params.tid) );
   Promise.all(animePromises)
   .then((db_data)=>{
-    res.header('Content-Type', 'application/json');
+    // レビューがない場合には新規作成する
+    if(db_data[0].length == 0){
+      return animeReview.initReview(req.params.tid);
+    }
+    else{
+      let res_body = {
+        status: 'ok',
+        body: Object.assign(db_data[0][0].dataValues, db_data[1][0].dataValues)
+      };
+      res.send(res_body);
+    }
+  })
+  .then((init_res)=>{
     let res_body = {
-      status: 'ok',
-      body: Object.assign(db_data[0][0].dataValues, db_data[1][0].dataValues)
+      status: 'ok make new review',
+      body: null
     };
     res.send(res_body);
   });

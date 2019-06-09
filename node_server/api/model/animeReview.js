@@ -30,6 +30,11 @@ module.exports = class{
   getAllAnimeReview(){
     return this.model.findAll();
   }
+  initReview(tid){
+    return this.model.create({
+      tid: tid
+    });
+  }
   updateReview(options){
     return this.model.update({
       rate: options.rate,
