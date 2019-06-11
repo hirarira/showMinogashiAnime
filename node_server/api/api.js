@@ -115,10 +115,21 @@ router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
       }
       // DB未登録なら、登録リストに入れておく
       if(isNoMatch){
-        console.log(anime);
+        let ngStory = {
+          tid: anime.TID,
+          count: anime.Count,
+          stTime: anime.StTime,
+          edTime: anime.EdTime,
+          lastUpdate: anime.LastUpdate,
+          subTitle: anime.SubTitle
+        }
+        noRegistrationStoryList.push(ngStory);
       }
     }
-    // animeStory のサブタイトルの更新があったらUpdate
+    console.log(noRegistrationStoryList);
+    // 未登録のアニメリストをDBに登録する
+    animeStory.insertAnimeStories(noRegistrationStoryList);
+    // TODO: animeStory のサブタイトルの更新があったらUpdate
     res.header('Content-Type', 'application/json');
     res.send(animeList);
   });

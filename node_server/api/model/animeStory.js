@@ -65,6 +65,9 @@ module.exports = class{
       }
     });
   }
+  insertAnimeStories(storyList){
+    return this.model.bulkCreate(storyList);
+  }
   setAnimeStory(options){
     console.log(options);
     return this.model.update({
