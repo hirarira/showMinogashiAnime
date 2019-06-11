@@ -58,6 +58,13 @@ module.exports = class{
       }
     });
   }
+  getAnimeStories(storyList){
+    return this.model.findAll({
+      where: {
+        [this.sequelize.Op.or]: storyList
+      }
+    });
+  }
   setAnimeStory(options){
     console.log(options);
     return this.model.update({

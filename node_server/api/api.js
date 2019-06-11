@@ -90,7 +90,35 @@ router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
         animeList['items'][i]['characterURL'] = response[match]['characterURL'];
       }
     }
-    // TODO: アニメ見逃し情報の取得
+    let searchStoryList = [];
+    for(let i=0; i<animeList['items'].length; i++){
+      let story = {}
+      story.tid = animeList['items'][i].TID;
+      story.count = animeList['items'][i].Count;
+      searchStoryList.push(story);
+    }
+    // 各話の見逃し情報を取得
+    return animeStory.getAnimeStories(searchStoryList);
+  })
+  .then((response)=>{
+    // animeStory の見逃し情報を animeListに入れる
+    // DB未登録のリスト
+    let noRegistrationStoryList = [];
+    for(let anime of animeList['items']){
+      let isNoMatch = true;
+      for(let story of response){
+        if(anime.TID == story.dataValues.tid && anime.Count == story.dataValues.count){
+          anime.minogashi = story.dataValues.minogashi;
+          isNoMatch = false;
+          break;
+        }
+      }
+      // DB未登録なら、登録リストに入れておく
+      if(isNoMatch){
+        console.log(anime);
+      }
+    }
+    // animeStory のサブタイトルの更新があったらUpdate
     res.header('Content-Type', 'application/json');
     res.send(animeList);
   });
