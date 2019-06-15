@@ -18,11 +18,10 @@
         return url;
       },
       changeMinogashi: function(e){
-        e.minogashi = !e.minogashi;
         $.post("./api/setAnimeStory",{
           tid: e.tid,
           count: e.count,
-          minogashi: e.minogashi,
+          minogashi: e.minogashi? 1: 0,
           comment: e.comment
         },(res)=>{
           // ローカルでも削除

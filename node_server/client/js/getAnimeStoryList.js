@@ -27,7 +27,7 @@
           $.post("./api/setAnimeStory",{
             tid: this.anime.about.tid,
             count: this.anime.count,
-            minogashi: this.anime.minogashi == 0? 1: 0,
+            minogashi: e.minogashi? 1: 0,
             comment: this.message
           },(res)=>{
             this.anime.comment = this.message;
@@ -38,7 +38,7 @@
           $.post("./api/setAnimeStory",{
             tid: e.tid,
             count: e.count,
-            minogashi: e.minogashi,
+            minogashi: e.minogashi? 1: 0,
             comment: e.comment
           })
           .done((res)=>{

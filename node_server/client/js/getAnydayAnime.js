@@ -89,7 +89,7 @@
           $.post("./api/setAnimeStory",{
             tid: e.tid,
             count: e.count,
-            minogashi: e.minogashi,
+            minogashi: e.minogashi? 1: 0,
             comment: e.comment
           },(res)=>{
             console.log(res);
