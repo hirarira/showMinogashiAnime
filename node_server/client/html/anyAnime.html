@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+    <title>アニメ関連</title>
+  </head>
+  <body>
+    <!-- メニューここから -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">menu</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="./index.html">アニメTOP</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./todayAnime.html">今日のアニメ一覧</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./yesterdayAnime.html">昨日のアニメ一覧</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./minogashi.html">見逃しアニメ一覧</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="./anyAnime.html">任意の日のアニメ</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./minogashiALL.html">見逃しアニメ一覧（全期間）</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./noCommentList.html">コメントなしアニメ一覧</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../../list/">Listに戻る</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- メニューここまで -->
+    <h2 class="text-center">日付指定</h2>
+    <div id="app">
+      <div class="form-group">
+        <label for="exampleInputEmail1">確認したい日付を指定してください</label>
+        <input v-model="setDate" type="date" class="form-control" id="exampleInputEmail1" placeholder="日付"  debounce="500">
+      </div>
+      <button v-on:click="searchAnime" class="btn btn-primary">取得する</button>
+      <button v-on:click="beforeWeek" class="btn btn-primary">先週</button>
+      <button v-on:click="beforeDay" class="btn btn-primary">前の日</button>
+      <button v-on:click="afterDay" class="btn btn-primary">次の日</button>
+      <button v-on:click="afterWeek" class="btn btn-primary">来週</button>
+      <hr>
+      <h2 class="text-center"> {{startDate.getMonth()+1}} / {{startDate.getDate()}} ( {{youbi[ startDate.getDay() ]}} ) のアニメ </h2>
+      <table class="table table-hover table-bordered">
+        <thead>
+          <tr>
+            <th scope="col" class="text-nowrap">ID</th>
+            <th scope="col" class="text-nowrap">タイトル</th>
+            <th scope="col" class="text-nowrap">回</th>
+            <th scope="col" class="text-nowrap d-none d-sm-table-cell">サブタイ</th>
+            <th scope="col" class="text-nowrap d-none d-sm-table-cell">放送日</th>
+            <th scope="col" class="text-nowrap">放送時刻</th>
+            <th scope="col" class="text-nowrap d-none d-xl-table-cell">コメント</th>
+            <th scope="col" class="text-nowrap">放送局</th>
+            <th scope="col" class="text-nowrap d-none d-lg-table-cell">公式サイト</th>
+            <th scope="col" class="text-nowrap">チェック用URL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in list" v-bind:class="{ 'table-danger': !item.minogashi }">
+            <td> {{item.id}} </td>
+            <td> <a v-bind:href="item.animeListURL" class="btn-link">{{item.title}}</a> </td>
+            <td> {{item.count}} </td>
+            <td class="d-none d-sm-table-cell"> <a v-bind:href="item.commentURL" class="btn-link">{{item.subTitle}}</a> </td>
+            <td class="text-nowrap d-none d-sm-table-cell"> {{item.startTime.getMonth()+1}} / {{item.startTime.getDate()}} ( {{item.youbi[ item.startTime.getDay() ]}} )</td>
+            <td class="text-nowrap"> {{('0'+item.startTime.getHours()).slice(-2)}} : {{('0'+item.startTime.getMinutes()).slice(-2)}} </td>
+            <td class="d-none d-xl-table-cell"> {{item.comment}} </td>
+            <td class="text-nowrap"> {{item.channel}} </td>
+            <td class="text-nowrap d-none d-lg-table-cell"> <a v-bind:href="item.topUrl" class="btn-info">公式サイト</a> </td>
+            <td class="text-nowrap"> <button v-on:click="changeMinogashi(item)" class="btn-success">見逃し</a> </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script type="text/javascript" src="./js/userConfig.js"></script>
+    <script type="text/javascript" src="./js/animedata.js"></script>
+    <script type="text/javascript" src="./js/getAnydayAnime.js"></script>
+  </body>
+</html>

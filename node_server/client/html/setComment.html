@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+    <title>アニメ関連</title>
+  </head>
+  <body>
+    <!-- メニューここから -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">menu</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="./index.html">アニメTOP</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./todayAnime.html">今日のアニメ一覧</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./yesterdayAnime.html">昨日のアニメ一覧</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./minogashi.html">見逃しアニメ一覧</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./anyAnime.html">任意の日のアニメ</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./minogashiALL.html">見逃しアニメ一覧（全期間）</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./noCommentList.html">コメントなしアニメ一覧</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../../list/">Listに戻る</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- メニューここまで -->
+    <div id="app">
+      <h1 class="text-center" v-if="anime">{{anime.about.title}}:第{{story.count}}話のコメント追加</h1>
+      <h2 class="text-center"> {{error}} </h2>
+      <div v-if="anime">
+        <table class="table table-hover table-bordered">
+          <tbody>
+            <tr>
+              <td> タイトル </td>
+              <td> <a v-bind:href="anime.animeListURL" class="btn-link">{{anime.about.title}}</a> </td>
+            </tr>
+            <tr>
+              <td> サブタイトル </td>
+              <td> {{story.subTitle}} </td>
+            </tr>
+            <tr>
+              <td> 回数 </td>
+              <td> {{story.count}} </td>
+            </tr>
+            <tr>
+              <td> 放送局 </td>
+              <td> {{anime.about.chName}} </td>
+            </tr>
+            <tr>
+              <td> URL </td>
+              <td> <a v-bind:href="anime.about.url.split('	')[0]">公式サイト</a> </td>
+            </tr>
+            <tr>
+              <td> Character </td>
+              <td> <a v-bind:href="anime.about.characterURL">Character</a> </td>
+            </tr>
+            <tr>
+              <td> 放送日 </td>
+              <td> {{ new Date(Number(story.stTime) * 1000) }} </td>
+            </tr>
+            <tr>
+              <td> 見逃し </td>
+              <td> {{story.minogashi}} </td>
+            </tr>
+            <tr>
+              <td> コメント </td>
+              <td> {{story.comment}} </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="form-group">
+          <label for="exampleFormControlTextarea1">コメントの編集</label>
+          <textarea class="form-control" id="animeComment" rows="3" v-model="message">{{story.comment}}</textarea>
+          <button class="btn btn-primary" v-on:click="updateComment()">送信する</button>
+        </div>
+      </div>
+    </div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script type="text/javascript" src="./js/addComment.js"></script>
+  </body>
+</html>
