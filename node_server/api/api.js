@@ -109,6 +109,7 @@ router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
       for(let story of response){
         if(anime.TID == story.dataValues.tid && anime.Count == story.dataValues.count){
           anime.minogashi = story.dataValues.minogashi;
+          anime.comment = story.dataValues.comment;
           isNoMatch = false;
           break;
         }
