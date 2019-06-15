@@ -20,7 +20,7 @@
           $.post("./api/setAnimeStory",{
             tid: this.anime.about.tid,
             count: this.story.count,
-            minogashi: this.story.minogashi == 0 ? 'false': 'true',
+            minogashi: this.story.minogashi,
             comment: this.message
           },(res)=>{
             this.story.comment = this.message;
