@@ -127,7 +127,8 @@ router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
         }
       }
       // DB未登録なら、登録リストに入れておく
-      if(isNoMatch){
+      // 話数がnullのアニメは登録しない
+      if(isNoMatch && anime.Count != null){
         let ngStory = {
           tid: anime.TID,
           count: anime.Count,
