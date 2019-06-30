@@ -69,10 +69,19 @@ module.exports = class{
     return this.model.bulkCreate(storyList);
   }
   setAnimeStory(options){
-    console.log(options);
     return this.model.update({
       minogashi: options.minogashi,
       comment: options.comment
+    },{
+      where: {
+        tid: options.tid,
+        count: options.count
+      }
+    });
+  }
+  updateSubTitle(options){
+    return this.model.update({
+      subTitle: options.subTitle
     },{
       where: {
         tid: options.tid,

@@ -111,6 +111,18 @@ router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
           anime.minogashi = story.dataValues.minogashi;
           anime.comment = story.dataValues.comment;
           isNoMatch = false;
+          // サブタイが更新されていたらDBを更新する
+          if(anime.SubTitle != story.dataValues.subTitle){
+            console.log(anime);
+            console.log(story.dataValues);
+            let options = {
+              tid: story.dataValues.tid,
+              count: story.dataValues.count,
+              subTitle: anime.SubTitle
+            }
+            console.log(options);
+            animeStory.updateSubTitle(options);
+          }
           break;
         }
       }
