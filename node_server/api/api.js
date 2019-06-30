@@ -254,7 +254,14 @@ router.get("/getAnimeReview/:tid", (req, res)=>{
   .then((db_data)=>{
     // レビューがない場合には新規作成する
     if(db_data[0].length == 0){
-      return animeReview.initReview(req.params.tid);
+      return animeReview.initReview(req.params.tid)
+      .then((init_res)=>{
+        let res_body = {
+          status: 'ok make new review',
+          body: null
+        };
+        res.send(res_body);
+      });
     }
     else{
       let res_body = {
@@ -264,13 +271,6 @@ router.get("/getAnimeReview/:tid", (req, res)=>{
       res.send(res_body);
     }
   })
-  .then((init_res)=>{
-    let res_body = {
-      status: 'ok make new review',
-      body: null
-    };
-    res.send(res_body);
-  });
 });
 
 // 全件のレビューを返す
