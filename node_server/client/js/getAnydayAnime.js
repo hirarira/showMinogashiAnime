@@ -25,7 +25,7 @@
   }
 
   window.onload = (()=>{
-    const START_DATE = 12;
+    const START_DATE = 5;
     let app = new Vue({
       el: '#app',
       data: {

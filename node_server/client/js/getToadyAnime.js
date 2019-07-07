@@ -35,14 +35,16 @@
    * https://sites.google.com/site/syobocal/spec/rss2-php
    *
    */
+  let now = moment().add(-5, 'hours');
+  let tomorrow = moment().add(-5, 'hours').add(1, 'days');
   // UPSFlag
   let in_url = "./api/getShoboiAnimeAnyDay";
   $.get(in_url, {
     filter: 1,
     alt: "json",
     usr: userName,
-    start: null,
-    end: null
+    start: now.format("YYYYMMDD0500"),
+    end: tomorrow.format("YYYYMMDD0500")
   },(importAnimeSet)=>{
     for(let i=0;i<importAnimeSet.items.length;i++){
       AnimeDataSet.push( new AnimeData(i, importAnimeSet.items[i]) );

@@ -35,12 +35,8 @@
    * https://sites.google.com/site/syobocal/spec/rss2-php
    *
    */
-  // 今日の日付
-  let endDate = new Date();
-  let endDateFormat = date_format(endDate);
-  // 開始時日付
-  let startDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() - 1, endDate.getHours(), endDate.getMinutes());
-  let startDateFormat = date_format(startDate);
+   let start = moment().add(-5, 'hours').add(-1, 'days');
+   let end = moment().add(-5, 'hours');
   // UPSFlag
   let in_url = "./api/getShoboiAnimeAnyDay";
   console.log(in_url);
@@ -48,8 +44,8 @@
     filter: 1,
     alt: "json",
     usr: userName,
-    start: startDateFormat,
-    end: endDateFormat
+    start: start.format("YYYYMMDD0500"),
+    end: end.format("YYYYMMDD0500")
   },(importAnimeSet)=>{
     for(let i=0;i<importAnimeSet.items.length;i++){
       AnimeDataSet.push( new AnimeData(i, importAnimeSet.items[i]) );
