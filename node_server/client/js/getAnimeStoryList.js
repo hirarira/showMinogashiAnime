@@ -50,7 +50,8 @@
             tid: this.review.tid,
             rate: this.review.rate,
             number: this.review.number,
-            comment: this.review.comment
+            comment: this.review.comment,
+            watchDate: this.review.watchDate
           },(res)=>{
             this.changeResult = res;
           });

@@ -199,7 +199,8 @@ router.post("/setAnimeReview", (req, res)=>{
   let options = {
     tid: req.body.tid,
     rate: req.body.rate,
-    comment: req.body.comment
+    comment: req.body.comment,
+    watchDate: req.body.watchDate
   };
   res.header('Content-Type', 'application/json');
   animeReview.updateReview(options)

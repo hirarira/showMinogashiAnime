@@ -38,7 +38,8 @@ module.exports = class{
   updateReview(options){
     return this.model.update({
       rate: options.rate,
-      comment: options.comment
+      comment: options.comment,
+      watchDate: options.watchDate
     },{
       where: {
         tid: options.tid
