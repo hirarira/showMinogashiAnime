@@ -5,7 +5,7 @@ module.exports = function(){
     name: 'anime',
     user: process.env.ANIME_DB_USER_NAME,
     pass: process.env.ANIME_DB_PASS,
-    host: 'localhost',
+    host: 'mariadb',
     dialect: 'mysql'
   };
 

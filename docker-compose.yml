@@ -15,7 +15,7 @@ services:
   mariadb:
     image: mariadb:latest
     volumes:
-    - ./sql:/docker-entrypoint-initdb.d
+      - ./sql:/docker-entrypoint-initdb.d
     restart: always
     environment:
       MYSQL_DATABASE: anime
