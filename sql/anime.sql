@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: 2019 年 6 月 15 日 20:18
+-- Generation Time: 2019 年 7 月 26 日 00:50
 -- サーバのバージョン： 10.1.26-MariaDB-0+deb9u1
--- PHP Version: 7.0.33-0+deb9u1
+-- PHP Version: 7.0.33-0+deb9u3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -30,10 +30,10 @@ CREATE TABLE `anime` (
   `tid` int(11) NOT NULL,
   `title` text NOT NULL,
   `chName` varchar(50) NOT NULL,
-  `url` text NOT NULL,
-  `hashTag` varchar(30) NOT NULL,
-  `characterURL` text NOT NULL,
-  `publicURL` text NOT NULL
+  `url` text,
+  `hashTag` varchar(30) DEFAULT NULL,
+  `characterURL` text,
+  `publicURL` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -44,12 +44,12 @@ CREATE TABLE `anime` (
 
 CREATE TABLE `animeReview` (
   `tid` int(11) NOT NULL,
-  `watchDate` text NOT NULL,
-  `rate` int(4) NOT NULL,
-  `airtime` int(4) NOT NULL,
-  `comment` text NOT NULL,
-  `original` text NOT NULL,
-  `genre` text NOT NULL
+  `watchDate` text,
+  `rate` int(4) DEFAULT NULL,
+  `airtime` int(4) DEFAULT NULL,
+  `comment` text,
+  `original` text,
+  `genre` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -67,7 +67,7 @@ CREATE TABLE `animeStory` (
   `LastUpdate` int(11) NOT NULL,
   `SubTitle` text NOT NULL COMMENT 'サブタイトル',
   `minogashi` tinyint(4) NOT NULL DEFAULT '0' COMMENT '見逃しフラグ',
-  `comment` text NOT NULL COMMENT 'ユーザコメント'
+  `comment` text COMMENT 'ユーザコメント'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -100,7 +100,7 @@ ALTER TABLE `animeStory`
 -- AUTO_INCREMENT for table `animeStory`
 --
 ALTER TABLE `animeStory`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2416;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2616;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
