@@ -53,7 +53,17 @@
           return;
         }
         app.anime = res['body'];
-        app.story = app.anime['story'][params.count-1];
+        let idx = null;
+        for(let i=0; i<app.anime['story'].length; i++){
+          if(app.anime['story'][i].count == app.params['count']){
+            idx = i;
+            break;
+          }
+        }
+        if(idx == null){
+          throw new Error("そんな話数は存在しません。");
+        }
+        app.story = app.anime['story'][idx];
         app.message = app.story.comment;
         app.story.showComment = app.story.comment.replace("\n", "\r\n");
         app.anime.animeListURL = "./showAnimeStoryList.html?tid="+app.anime['about'].tid;
