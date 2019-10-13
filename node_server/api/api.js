@@ -10,6 +10,8 @@ const DBSetting = require('./model/dbSetting.js');
 const sequelize = DBSetting();
 let moment = require('moment');
 let request_promise = require('request-promise');
+const parser = require('fast-xml-parser');
+
 let animeReview = new AnimeReview(sequelize);
 let animeAbout = new AnimeAbout(sequelize);
 let animeStory = new AnimeStory(sequelize);
@@ -349,6 +351,85 @@ router.get("/getWeekMinogashiAnime", (req, res)=>{
       status: 'ok',
       body: minogashiAnimeList
     };
+    res.send(res_body);
+  });
+});
+
+// 未登録のアニメのサブタイを取得して登録
+router.get("/getNoRegistStories/:tid", (req, res)=>{
+  const base_url = "http://cal.syoboi.jp/db.php?Command=TitleLookup&TID=";
+  const tid = req.params.tid;
+  const url = base_url + tid;
+  let storyList = [];
+  let baseStory = {
+    tid: tid,
+    count: null,
+    stTime: 0,
+    edTime: 0,
+    lastUpdate: 0,
+    subTitle: ''
+  }
+  // ベースとなるレスポンス
+  let res_body = {
+    status: 'ok',
+    comment: '',
+    regStories: []
+  };
+
+  request_promise.get({
+    url: url
+  })
+  .then((stories)=>{
+    let json = parser.parse(stories);
+    let titleItem = json['TitleLookupResponse']['TitleItems']['TitleItem'];
+    let subTitleLines = titleItem['SubTitles'].split("\r\n");
+    for(let i in subTitleLines){
+      storyList.push( subTitleLines[i].split(/\*(.*?)\*/).filter(e => e) );
+    }
+    return animeStory.getAllAnimeStory(tid);
+  })
+  .then((noRegStoriesDefault)=>{
+    res.header('Content-Type', 'application/json');
+    let existStoryList = noRegStoriesDefault.map(x => x['dataValues']['count']);
+    // 1話も登録されていない場合にはエラーとする
+    console.log(existStoryList);
+    if(existStoryList.length <= 0){
+      return 1;
+    }
+    let noRegStories = [];
+    for(let i=0; i<storyList.length; i++){
+      // DB上に含まれてるかチェック
+      storyList[i][0] = Number(storyList[i][0])
+      if(existStoryList.indexOf( storyList[i][0] ) == -1){
+        let noRegStory = Object.assign({}, baseStory);
+        noRegStory['count'] = storyList[i][0];
+        noRegStory['subTitle'] = storyList[i][1];
+        noRegStories.push(noRegStory);
+      }
+    }
+    // 登録するアニメがない場合
+    if(noRegStories.length == 0){
+      return 2;
+    }
+    else{
+      res_body['regStories'] = noRegStories;
+      return animeStory.insertAnimeStories(noRegStories);
+    }
+  })
+  .then((regResult)=>{
+    switch (regResult) {
+      case 1:
+        res.status(400);
+        res_body['status'] = 'ng';
+        res_body['comment'] = 'The anime is unregistered';
+        break;
+      case 2:
+        res_body['comment'] = 'There is no anime to register';
+        break;
+      default:
+        res_body['comment'] = 'All registered successfully';
+      break;
+    }
     res.send(res_body);
   });
 });
