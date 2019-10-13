@@ -430,6 +430,7 @@ router.get("/getNoRegistStories/:tid", (req, res)=>{
         res_body['comment'] = 'All registered successfully';
       break;
     }
+    res_body['date'] = new Date();
     res.send(res_body);
   });
 });
