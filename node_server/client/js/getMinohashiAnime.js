@@ -41,7 +41,6 @@
   $.get(in_url,{
     filter: 1,
     alt: "json",
-    usr: userName
   },(response)=>{
     let importAnimeSet = response['body'];
     let AnimeDataSet = [];
