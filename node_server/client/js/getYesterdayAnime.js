@@ -43,7 +43,6 @@
   $.get(in_url,{
     filter: 1,
     alt: "json",
-    usr: userName,
     start: start.format("YYYYMMDD0500"),
     end: end.format("YYYYMMDD0500")
   },(importAnimeSet)=>{

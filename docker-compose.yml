@@ -1,0 +1,24 @@
+version: '3.1'
+
+services:
+  node:
+    build: ./dockerfiles/
+    volumes:
+      - ./node_server:/server
+    ports:
+      - "3333:3333"
+    links:
+      - mariadb
+    working_dir: /server
+    command: [sh, -c, npm install && npm start]
+
+  mariadb:
+    image: mariadb:latest
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+    restart: always
+    environment:
+      MYSQL_DATABASE: anime
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: mariadb
+      MYSQL_ROOT_PASSWORD: mariadb
