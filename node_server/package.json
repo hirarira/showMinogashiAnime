@@ -5,10 +5,11 @@
   "main": "server.js",
   "dependencies": {
     "express": "^4.17.1",
+    "fast-xml-parser": "^3.13.0",
     "mysql2": "^1.6.5",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
-    "sequelize": "^5.8.7"
+    "sequelize": "^5.10.1"
   },
   "devDependencies": {},
   "scripts": {

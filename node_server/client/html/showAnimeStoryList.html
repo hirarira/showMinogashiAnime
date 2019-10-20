@@ -41,7 +41,7 @@
             <a class="nav-link" href="./noCommentList.html">コメントなしアニメ一覧</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="../../list/">Listに戻る</a>
+            <a class="nav-link" href="../../apache/list/">Listに戻る</a>
           </li>
         </ul>
       </div>
@@ -153,6 +153,26 @@
         <input type="text" class="form-control" v-model="characterURL">
         <button class="btn btn-primary" v-on:click="updateAnimeAbout">送信する</button>
       </div>
+      <hr>
+      <h3 class="text-center">番組情報の取得</h3>
+
+      <table class="table table-hover table-bordered">
+        <tbody v-if="getShoboiReult">
+          <tr>
+            <td class="text-nowrap"> status </td>
+            <td> {{getShoboiReult.status}} </td>
+          </tr>
+          <tr>
+            <td class="text-nowrap"> comment </td>
+            <td> {{getShoboiReult.comment}} </td>
+          </tr>
+          <tr>
+            <td class="text-nowrap"> date </td>
+            <td> {{getShoboiReult.date}} </td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn btn-primary" v-on:click="getNoRegistStories">送信する</button>
     </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

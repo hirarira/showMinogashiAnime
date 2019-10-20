@@ -20,7 +20,8 @@
         tid: null,
         hashTag: null,
         publicURL: null,
-        characterURL: null
+        characterURL: null,
+        getShoboiReult: null
       },
       methods:{
         updateComment: function(){
@@ -65,6 +66,12 @@
             publicURL: this.publicURL
           },(res)=>{
             console.log(res);
+          });
+        },
+        // アニメの各話情報の取得と収集をする
+        getNoRegistStories: function(e){
+          $.get(`./api/getNoRegistStories/${this.tid}`, (res)=>{
+            this.getShoboiReult = res;
           });
         }
       }
