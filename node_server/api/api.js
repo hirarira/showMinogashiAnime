@@ -192,7 +192,8 @@ router.post("/setAnimeStory",(req, res)=>{
   .catch((e)=>{
     let res_body = {
       status: 'ng',
-      date: moment()
+      date: moment(),
+      e: e
     };
     res.send(res_body);
   });
@@ -218,7 +219,8 @@ router.post("/setAnimeReview", (req, res)=>{
   .catch((e)=>{
     let res_body = {
       status: 'ng',
-      date: moment()
+      date: moment(),
+      e: e
     };
     res.send(res_body);
   });
@@ -244,7 +246,8 @@ router.post("/setAnimeAbout", (req, res)=>{
   .catch((e)=>{
     let res_body = {
       status: 'ng',
-      date: moment()
+      date: moment(),
+      e: e
     };
     res.send(res_body);
   });
