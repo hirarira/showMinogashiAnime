@@ -16,6 +16,8 @@ let animeReview = new AnimeReview(sequelize);
 let animeAbout = new AnimeAbout(sequelize);
 let animeStory = new AnimeStory(sequelize);
 
+const username = process.env.ANIME_SHOBOI_CALENDAR_USERNAME;
+
 if(animeReview == null){
   return;
 }
@@ -37,7 +39,7 @@ function assignAnimeAboutAndStory(about, story){
 }
 
 router.use(function timeLog (req, res, next) {
-  console.log('Time: ', Date.now())
+  console.log('Time: ', Date.now());
   next();
 });
 
@@ -49,7 +51,7 @@ router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
   let options = {
     filter: req.query.filter,
     alt: req.query.alt,
-    usr: req.query.usr,
+    usr: username,
     start: req.query.start,
     end: req.query.end
   }

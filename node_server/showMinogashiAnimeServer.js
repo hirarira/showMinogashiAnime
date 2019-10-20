@@ -2,6 +2,7 @@
 const Express = require("express");
 const BodyParser = require('body-parser');
 const app = Express();
+const username = process.env.ANIME_SHOBOI_CALENDAR_USERNAME;
 
 // urlencodedとjsonは別々に初期化する
 app.use(BodyParser.urlencoded({
@@ -25,6 +26,19 @@ app.use('/api', api);
 app.get("/test", (req, res)=>{
   res.header('Content-Type', 'application/json');
   let res_body = { status: 'ok' };
+  res.send(res_body);
+});
+
+app.get("/username", (req, res)=>{
+  res.header('Content-Type', 'application/json');
+  let status = 'ok';
+  if(!username){
+    status = 'ng'
+  }
+  let res_body = {
+    status: status,
+    username: username
+  };
   res.send(res_body);
 });
 
