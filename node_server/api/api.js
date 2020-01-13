@@ -395,13 +395,14 @@ router.get("/getNoRegistStories/:tid", (req, res)=>{
   })
   .then((noRegStoriesDefault)=>{
     res.header('Content-Type', 'application/json');
-    let existStoryList = noRegStoriesDefault.map(x => x['dataValues']['count']);
+    let registStoryList = noRegStoriesDefault.map(x => x['dataValues']);
+    let existStoryList = registStoryList.map(x => x['count']);
     // 1話も登録されていない場合にはエラーとする
-    console.log(existStoryList);
     if(existStoryList.length <= 0){
       return 1;
     }
     let noRegStories = [];
+    let updateStories = [];
     for(let i=0; i<storyList.length; i++){
       // DB上に含まれてるかチェック
       storyList[i][0] = Number(storyList[i][0])
@@ -411,14 +412,32 @@ router.get("/getNoRegistStories/:tid", (req, res)=>{
         noRegStory['subTitle'] = storyList[i][1];
         noRegStories.push(noRegStory);
       }
+      else{
+        // DB上のサブタイが最新のものかチェック
+        let registedStory = registStoryList.find(x => x.count == storyList[i][0]);
+        // DB上のサブタイとAPI取得のサブタイが異なる場合
+        if(registedStory && (storyList[i][1] != registedStory.subTitle)){
+          updateStories.push({
+            tid: registedStory.tid,
+            count: registedStory.count,
+            subTitle: storyList[i][1]
+          });
+        }
+      }
     }
     // 登録するアニメがない場合
-    if(noRegStories.length == 0){
+    if(noRegStories.length == 0 && updateStories.length == 0){
       return 2;
     }
     else{
-      res_body['regStories'] = noRegStories;
-      return animeStory.insertAnimeStories(noRegStories);
+      for(let i=0; i<updateStories.length; i++){
+        // アニメのサブタイを更新（返り値は無視）
+        animeStory.updateSubTitle(updateStories[i]);
+      }
+      if(noRegStories.length != 0){
+        res_body['regStories'] = noRegStories;
+        return animeStory.insertAnimeStories(noRegStories);
+      }
     }
   })
   .then((regResult)=>{
