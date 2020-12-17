@@ -299,30 +299,9 @@ router.get("/getAllAnimeReview", (req, res)=>{
 });
 
 // 全ての見逃しアニメ情報を取得
-router.get("/getAllMinogashiAnime", (req, res)=>{
-  let minogashiAnimeListData;
-  animeModel.story.getAllMinogashiStory()
-  .then((minogashiList)=>{
-    let tidList = [];
-    for(let i=0; i<minogashiList.length; i++){
-      if( tidList.indexOf(minogashiList[i].tid) == -1 ){
-        tidList.push(minogashiList[i].tid);
-      }
-    }
-    minogashiAnimeListData = minogashiList;
-    return animeModel.about.getAnimeList(tidList);
-  })
-  .then((animeList)=>{
-    const minogashiAnimeList = lib.assignAnimeAboutAndStory(animeList, minogashiAnimeListData);
-    res.header('Content-Type', 'application/json');
-    const res_body = {
-      status: 'ok',
-      body: minogashiAnimeList
-    };
-    res.send(res_body);
-  });
-});
+getMinogashi.getAll(router, animeModel);
 
+// アニメの見逃し情報を取得する
 getMinogashi.getWeek(router, animeModel);
 
 // 未登録のアニメのサブタイを取得して登録
