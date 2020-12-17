@@ -1,7 +1,6 @@
 "use strict";
 const Express = require("express");
 let router = Express.Router();
-const Sequelize = require('sequelize');
 const AnimeReview = require('./model/animeReview.js');
 const AnimeAbout = require('./model/anime.js');
 const AnimeStory = require('./model/animeStory.js');
@@ -12,30 +11,24 @@ let moment = require('moment');
 let request_promise = require('request-promise');
 const parser = require('fast-xml-parser');
 
-let animeReview = new AnimeReview(sequelize);
-let animeAbout = new AnimeAbout(sequelize);
-let animeStory = new AnimeStory(sequelize);
+const animeReview = new AnimeReview(sequelize);
+const animeAbout = new AnimeAbout(sequelize);
+const animeStory = new AnimeStory(sequelize);
+
+const animeModel = {
+  review: new AnimeReview(sequelize),
+  about: new AnimeAbout(sequelize),
+  story: new AnimeStory(sequelize)
+}
+
+const getMinogashi = require('./getMinogashiAnime');
+
+const lib = require('./lib');
 
 const username = process.env.ANIME_SHOBOI_CALENDAR_USERNAME;
 
 if(animeReview == null){
   return;
-}
-
-// アニメ情報とアニメ各話情報の結合
-function assignAnimeAboutAndStory(about, story){
-  let minogashiAnimeList = [];
-  for(let i=0; i<story.length; i++){
-    for(let j=0; j<about.length; j++){
-      if(story[i].tid == about[j].tid){
-        minogashiAnimeList.push(
-           Object.assign(story[i].dataValues, about[j].dataValues)
-        );
-        break;
-      }
-    }
-  }
-  return minogashiAnimeList;
 }
 
 router.use(function timeLog (req, res, next) {
@@ -324,9 +317,9 @@ router.get("/getAllMinogashiAnime", (req, res)=>{
     return animeAbout.getAnimeList(tidList);
   })
   .then((animeList)=>{
-    let minogashiAnimeList = assignAnimeAboutAndStory(animeList, minogashiAnimeListData);
+    const minogashiAnimeList = lib.assignAnimeAboutAndStory(animeList, minogashiAnimeListData);
     res.header('Content-Type', 'application/json');
-    let res_body = {
+    const res_body = {
       status: 'ok',
       body: minogashiAnimeList
     };
@@ -334,31 +327,7 @@ router.get("/getAllMinogashiAnime", (req, res)=>{
   });
 });
 
-// 過去一週間の見逃しアニメ情報を取得
-router.get("/getWeekMinogashiAnime", (req, res)=>{
-  let minogashiAnimeListData;
-  let lastWeek = moment().subtract(7, 'days').startOf('day');
-  animeStory.getWeekMinogashiAnime(lastWeek)
-  .then((minogashiList)=>{
-    let tidList = [];
-    for(let i=0; i<minogashiList.length; i++){
-      if( tidList.indexOf(minogashiList[i].tid) == -1 ){
-        tidList.push(minogashiList[i].tid);
-      }
-    }
-    minogashiAnimeListData = minogashiList;
-    return animeAbout.getAnimeList(tidList);
-  })
-  .then((animeList)=>{
-    let minogashiAnimeList = assignAnimeAboutAndStory(animeList, minogashiAnimeListData);
-    res.header('Content-Type', 'application/json');
-    let res_body = {
-      status: 'ok',
-      body: minogashiAnimeList
-    };
-    res.send(res_body);
-  });
-});
+getMinogashi.getWeek(router, animeModel);
 
 // 未登録のアニメのサブタイを取得して登録
 router.get("/getNoRegistStories/:tid", (req, res)=>{
