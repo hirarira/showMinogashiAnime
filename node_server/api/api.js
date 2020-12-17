@@ -11,10 +11,6 @@ let moment = require('moment');
 let request_promise = require('request-promise');
 const parser = require('fast-xml-parser');
 
-const animeReview = new AnimeReview(sequelize);
-const animeAbout = new AnimeAbout(sequelize);
-const animeStory = new AnimeStory(sequelize);
-
 const animeModel = {
   review: new AnimeReview(sequelize),
   about: new AnimeAbout(sequelize),
@@ -27,7 +23,7 @@ const lib = require('./lib');
 
 const username = process.env.ANIME_SHOBOI_CALENDAR_USERNAME;
 
-if(animeReview == null){
+if(animeModel.review == null){
   return;
 }
 
@@ -59,7 +55,7 @@ router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
     for(let i=0; i<animeList['items'].length; i++){
       tidlist.push(animeList['items'][i].TID);
     }
-    return animeAbout.getAnimeList(tidlist);
+    return animeModel.about.getAnimeList(tidlist);
   })
   .then((response)=>{
     for(let i=0; i<animeList['items'].length; i++){
@@ -79,7 +75,7 @@ router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
           url: animeList['items'][i]['Urls']
         }
         // TODO: ここで正常に挿入できたかPromiseの結果を見たい
-        animeAbout.insertAnimeAbout(options);
+        animeModel.about.insertAnimeAbout(options);
       }
       // アニメの概要があればDBの情報とマージ
       else{
@@ -95,7 +91,7 @@ router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
       searchStoryList.push(story);
     }
     // 各話の見逃し情報を取得
-    return animeStory.getAnimeStories(searchStoryList);
+    return animeModel.story.getAnimeStories(searchStoryList);
   })
   .then((response)=>{
     // animeStory の見逃し情報を animeListに入れる
@@ -118,7 +114,7 @@ router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
               subTitle: anime.SubTitle
             }
             console.log(options);
-            animeStory.updateSubTitle(options);
+            animeModel.story.updateSubTitle(options);
           }
           break;
         }
@@ -139,7 +135,7 @@ router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
     }
     console.log(noRegistrationStoryList);
     // 未登録のアニメリストをDBに登録する
-    animeStory.insertAnimeStories(noRegistrationStoryList);
+    animeModel.story.insertAnimeStories(noRegistrationStoryList);
     // TODO: animeStory のサブタイトルの更新があったらUpdate
     res.header('Content-Type', 'application/json');
     res.send(animeList);
@@ -149,8 +145,8 @@ router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
 // アニメの全話数情報を取得
 router.get("/getAnimeStoryList/:tid", (req, res)=>{
   let animePromises = [];
-  animePromises.push( animeAbout.getAnime(req.params.tid) );
-  animePromises.push( animeStory.getAllAnimeStory(req.params.tid) );
+  animePromises.push( animeModel.about.getAnime(req.params.tid) );
+  animePromises.push( animeModel.story.getAllAnimeStory(req.params.tid) );
   Promise.all(animePromises)
   .then((db_data)=>{
     res.header('Content-Type', 'application/json');
@@ -174,7 +170,7 @@ router.post("/setAnimeStory",(req, res)=>{
     comment: req.body.comment
   };
   res.header('Content-Type', 'application/json');
-  animeStory.setAnimeStory(options)
+  animeModel.story.setAnimeStory(options)
   .then((response)=>{
     let res_body = {
       status: 'ok',
@@ -201,7 +197,7 @@ router.post("/setAnimeReview", (req, res)=>{
     watchDate: req.body.watchDate
   };
   res.header('Content-Type', 'application/json');
-  animeReview.updateReview(options)
+  animeModel.review.updateReview(options)
   .then((response)=>{
     let res_body = {
       status: 'ok',
@@ -228,7 +224,7 @@ router.post("/setAnimeAbout", (req, res)=>{
     publicURL: req.body.publicURL
   };
   res.header('Content-Type', 'application/json');
-  animeAbout.updateAnimeAbout(options)
+  animeModel.about.updateAnimeAbout(options)
   .then((response)=>{
     let res_body = {
       status: 'ok',
@@ -250,13 +246,13 @@ router.post("/setAnimeAbout", (req, res)=>{
 router.get("/getAnimeReview/:tid", (req, res)=>{
   res.header('Content-Type', 'application/json');
   let animePromises = [];
-  animePromises.push( animeReview.getAnimeReview(req.params.tid) );
-  animePromises.push( animeAbout.getAnime(req.params.tid) );
+  animePromises.push( animeModel.review.getAnimeReview(req.params.tid) );
+  animePromises.push( animeModel.about.getAnime(req.params.tid) );
   Promise.all(animePromises)
   .then((db_data)=>{
     // レビューがない場合には新規作成する
     if(db_data[0].length == 0){
-      return animeReview.initReview(req.params.tid)
+      return animeModel.review.initReview(req.params.tid)
       .then((init_res)=>{
         let res_body = {
           status: 'ok make new review',
@@ -278,8 +274,8 @@ router.get("/getAnimeReview/:tid", (req, res)=>{
 // 全件のレビューを返す
 router.get("/getAllAnimeReview", (req, res)=>{
   let animePromises = [];
-  animePromises.push( animeReview.getAllAnimeReview() );
-  animePromises.push( animeAbout.getAllAnime() );
+  animePromises.push( animeModel.review.getAllAnimeReview() );
+  animePromises.push( animeModel.about.getAllAnime() );
   Promise.all(animePromises)
   .then((db_datas)=>{
     let animeList = [];
@@ -305,7 +301,7 @@ router.get("/getAllAnimeReview", (req, res)=>{
 // 全ての見逃しアニメ情報を取得
 router.get("/getAllMinogashiAnime", (req, res)=>{
   let minogashiAnimeListData;
-  animeStory.getAllMinogashiStory()
+  animeModel.story.getAllMinogashiStory()
   .then((minogashiList)=>{
     let tidList = [];
     for(let i=0; i<minogashiList.length; i++){
@@ -314,7 +310,7 @@ router.get("/getAllMinogashiAnime", (req, res)=>{
       }
     }
     minogashiAnimeListData = minogashiList;
-    return animeAbout.getAnimeList(tidList);
+    return animeModel.about.getAnimeList(tidList);
   })
   .then((animeList)=>{
     const minogashiAnimeList = lib.assignAnimeAboutAndStory(animeList, minogashiAnimeListData);
@@ -360,7 +356,7 @@ router.get("/getNoRegistStories/:tid", (req, res)=>{
     for(let i in subTitleLines){
       storyList.push( subTitleLines[i].split(/\*(.*?)\*/).filter(e => e) );
     }
-    return animeStory.getAllAnimeStory(tid);
+    return animeModel.story.getAllAnimeStory(tid);
   })
   .then((noRegStoriesDefault)=>{
     res.header('Content-Type', 'application/json');
@@ -401,11 +397,11 @@ router.get("/getNoRegistStories/:tid", (req, res)=>{
     else{
       for(let i=0; i<updateStories.length; i++){
         // アニメのサブタイを更新（返り値は無視）
-        animeStory.updateSubTitle(updateStories[i]);
+        animeModel.story.updateSubTitle(updateStories[i]);
       }
       if(noRegStories.length != 0){
         res_body['regStories'] = noRegStories;
-        return animeStory.insertAnimeStories(noRegStories);
+        return animeModel.story.insertAnimeStories(noRegStories);
       }
     }
   })
