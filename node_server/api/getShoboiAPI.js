@@ -1,5 +1,4 @@
 "use strict";
-const moment = require('moment');
 const request = require('request-promise');
 const username = process.env.ANIME_SHOBOI_CALENDAR_USERNAME;
 const parser = require('fast-xml-parser');
