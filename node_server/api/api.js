@@ -18,6 +18,8 @@ const animeModel = {
 const getMinogashi = require('./getMinogashiAnime');
 const getShoboiAPI = require('./getShoboiAPI');
 const getReview = require('./getReview');
+const getInfo = require('./getInfo');
+const updateInfo = require('./updateInfo');
 
 if(animeModel.review == null){
   return;
@@ -29,121 +31,43 @@ router.use(function timeLog (req, res, next) {
 });
 
 // しょぼいカレンダーより任意の日付の見るアニメを取得
+// GET /getShoboiAnimeAnyDay/
 getShoboiAPI.getAnyDay(router, animeModel);
 
 // 未登録のアニメのサブタイを取得して登録
+// GET /getNoRegistStories/:tid
 getShoboiAPI.getNoRegistStories(router, animeModel);
 
 // 全ての見逃しアニメ情報を取得
+// GET /getWeekMinogashiAnime
 getMinogashi.getAll(router, animeModel);
 
 // アニメの見逃し情報を取得する
+// GET /getAllMinogashiAnime
 getMinogashi.getWeek(router, animeModel);
 
 // レビューを1件返す
+// GET /getAnimeReview/:tid
 getReview.getOne(router, animeModel);
 
 // 全件のレビューを返す
+// GET /getAllAnimeReview
 getReview.getAll(router, animeModel);
 
 // アニメの全話数情報を取得
-router.get("/getAnimeStoryList/:tid", (req, res)=>{
-  let animePromises = [];
-  animePromises.push( animeModel.about.getAnime(req.params.tid) );
-  animePromises.push( animeModel.story.getAllAnimeStory(req.params.tid) );
-  Promise.all(animePromises)
-  .then((db_data)=>{
-    res.header('Content-Type', 'application/json');
-    let res_body = {
-      status: 'ok',
-      body: {
-        about: db_data[0][0],
-        story: db_data[1]
-      }
-    };
-    res.send(res_body);
-  });
-});
+// GET /getAnimeStoryList/:tid
+getInfo.getAnyDay(router, animeModel);
 
 // アニメの話数情報を更新
-router.post("/setAnimeStory",(req, res)=>{
-  let options = {
-    tid: req.body.tid,
-    count: req.body.count,
-    minogashi: req.body.minogashi,
-    comment: req.body.comment
-  };
-  res.header('Content-Type', 'application/json');
-  animeModel.story.setAnimeStory(options)
-  .then((response)=>{
-    let res_body = {
-      status: 'ok',
-      date: moment()
-    };
-    res.send(res_body);
-  })
-  .catch((e)=>{
-    let res_body = {
-      status: 'ng',
-      date: moment(),
-      e: e
-    };
-    res.send(res_body);
-  });
-});
+// POST /setAnimeStory
+updateInfo.setStory(router, animeModel);
 
 // アニメのレビューを更新
-router.post("/setAnimeReview", (req, res)=>{
-  let options = {
-    tid: req.body.tid,
-    rate: req.body.rate,
-    comment: req.body.comment,
-    watchDate: req.body.watchDate
-  };
-  res.header('Content-Type', 'application/json');
-  animeModel.review.updateReview(options)
-  .then((response)=>{
-    let res_body = {
-      status: 'ok',
-      date: moment()
-    };
-    res.send(res_body);
-  })
-  .catch((e)=>{
-    let res_body = {
-      status: 'ng',
-      date: moment(),
-      e: e
-    };
-    res.send(res_body);
-  });
-});
+// POST /setAnimeReview
+updateInfo.setReview(router, animeModel);
 
 // アニメの概要を更新
-router.post("/setAnimeAbout", (req, res)=>{
-  let options = {
-    tid: req.body.tid,
-    hashTag: req.body.hashTag,
-    characterURL: req.body.characterURL,
-    publicURL: req.body.publicURL
-  };
-  res.header('Content-Type', 'application/json');
-  animeModel.about.updateAnimeAbout(options)
-  .then((response)=>{
-    let res_body = {
-      status: 'ok',
-      date: moment()
-    };
-    res.send(res_body);
-  })
-  .catch((e)=>{
-    let res_body = {
-      status: 'ng',
-      date: moment(),
-      e: e
-    };
-    res.send(res_body);
-  });
-});
+// POST /setAnimeAbout
+updateInfo.setAbout(router, animeModel);
 
 module.exports = router;
