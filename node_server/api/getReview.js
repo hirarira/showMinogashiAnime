@@ -75,7 +75,22 @@ exports.getWatchDate = (router, animeModel) => {
 
 // 特定の得点のアニメレビューを取得する
 exports.getRoundRate = (router, animeModel) => {
-
+  router.get("/getRoundRate/:highLimit/:lowLimit", async (req, res)=>{
+    const lowLimit = req.params.lowLimit;
+    const highLimit = req.params.highLimit;
+    const reviewList = await animeModel.review.getRateAnimeReview(lowLimit, highLimit);
+    const tidList = reviewList.map((anime)=>{
+      return anime.tid
+    });
+    const animeAboutList = await animeModel.about.getAnimeList(tidList);
+    const animeList = mergeAnimeInfo(animeAboutList, reviewList);
+    res.header('Content-Type', 'application/json');
+    let res_body = {
+      status: 'ok',
+      body: animeList
+    };
+    res.send(res_body);
+  });
 }
 
 // 全件のレビューを返す

@@ -54,6 +54,10 @@ getReview.getOne(router, animeModel);
 // GET /getWatchDate/:watchDate
 getReview.getWatchDate(router, animeModel);
 
+// 特定の得点のアニメレビューを取得する
+// GET /getRoundRate
+getReview.getRoundRate(router, animeModel);
+
 // 全件のレビューを返す
 // GET /getAllAnimeReview
 getReview.getAll(router, animeModel);

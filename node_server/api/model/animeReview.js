@@ -40,7 +40,7 @@ module.exports = class{
     return this.model.findAll({
       where: {
         rate: {
-          [this.Sequelize.Op.ibetweenn]: [lowLimit, highLimit]
+          [this.Sequelize.Op.between]: [lowLimit, highLimit]
         }
       }
     });
