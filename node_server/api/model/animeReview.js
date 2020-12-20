@@ -36,6 +36,15 @@ module.exports = class{
       }
     });
   }
+  getRateAnimeReview(lowLimit, highLimit) {
+    return this.model.findAll({
+      where: {
+        rate: {
+          [this.Sequelize.Op.ibetweenn]: [lowLimit, highLimit]
+        }
+      }
+    });
+  }
   getAnimeReviews(tidList){
     return this.model.findAll({
       where: {
