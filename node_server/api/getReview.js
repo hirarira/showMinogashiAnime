@@ -31,6 +31,31 @@ exports.getOne = (router, animeModel) => {
   });
 };
 
+// 特定の視聴月に一致するレビューを取得する
+exports.getWatchDate = (router, animeModel) => {
+  router.get("/getWatchDate/:watchDate", async (req, res)=>{
+    const watchDate = req.params.watchDate;
+    const reviewList = await animeModel.review.getWatchDateAnimes(watchDate);
+    const tidList = reviewList.map((anime)=>{
+      return anime.tid
+    });
+    const animeAboutList = await animeModel.about.getAnimeList(tidList);
+    let animeList = [];
+    animeAboutList.map((animeAbout)=>{
+      const getReview = reviewList.find((review)=>{
+        return review.tid === animeAbout.tid;
+      })
+      animeList.push( Object.assign(animeAbout.dataValues, getReview.dataValues) );
+    });
+    res.header('Content-Type', 'application/json');
+    let res_body = {
+      status: 'ok',
+      body: animeList
+    };
+    res.send(res_body);
+  });
+}
+
 // 全件のレビューを返す
 exports.getAll = (router, animeModel) => {
   router.get("/getAllAnimeReview", (req, res)=>{

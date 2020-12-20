@@ -1,19 +1,19 @@
 module.exports = class{
-  constructor(sequelize) {
-    const Sequelize = require('sequelize');
-    this.model = sequelize.define('animeReview', {
+  constructor(seq) {
+    this.Sequelize = require('sequelize');
+    this.model = seq.define('animeReview', {
       // フィールド名
       tid: {
         // フィールドの型
-        type: Sequelize.INTEGER,
+        type: this.Sequelize.INTEGER,
         primaryKey: true
       },
-      watchDate: Sequelize.TEXT,
-      rate: Sequelize.INTEGER,
-      airtime: Sequelize.INTEGER,
-      comment: Sequelize.TEXT,
-      original: Sequelize.TEXT,
-      genre: Sequelize.TEXT
+      watchDate: this.Sequelize.TEXT,
+      rate: this.Sequelize.INTEGER,
+      airtime: this.Sequelize.INTEGER,
+      comment: this.Sequelize.TEXT,
+      original: this.Sequelize.TEXT,
+      genre: this.Sequelize.TEXT
     }, {
       // モデル名をそのままテーブル名として使う
       freezeTableName: true,
@@ -24,6 +24,24 @@ module.exports = class{
     return this.model.findAll({
       where: {
         tid: tid
+      }
+    });
+  }
+  getWatchDateAnimes(watchDate) {
+    return this.model.findAll({
+      where: {
+        watchDate: {
+          [this.Sequelize.Op.like]: `%${watchDate}%`
+        }
+      }
+    });
+  }
+  getAnimeReviews(tidList){
+    return this.model.findAll({
+      where: {
+        tid: {
+          [this.Sequelize.Op.in]: tidList
+        }
       }
     });
   }

@@ -50,6 +50,10 @@ getMinogashi.getWeek(router, animeModel);
 // GET /getAnimeReview/:tid
 getReview.getOne(router, animeModel);
 
+// 特定の放送年度のアニメを取得する
+// GET /getWatchDate/:watchDate
+getReview.getWatchDate(router, animeModel);
+
 // 全件のレビューを返す
 // GET /getAllAnimeReview
 getReview.getAll(router, animeModel);
