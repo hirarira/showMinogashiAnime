@@ -98,8 +98,6 @@ exports.getAll = (router, animeModel) => {
   router.get("/getAllAnimeReview", async (req, res)=>{
     const reviewList = await animeModel.review.getAllAnimeReview();
     const animeAboutList = await animeModel.about.getAllAnime();
-    console.log(reviewList.length);
-    console.log(animeAboutList.length);
     const animeList = mergeAnimeInfo(animeAboutList, reviewList);
     res.header('Content-Type', 'application/json');
     let res_body = {
