@@ -29,7 +29,8 @@ exports.getNowAnime = (router, animeModel) => {
     const limit = req.params.limit;
     const start = moment(now).add('minutes', 1);
     const end = moment(now).add('minutes', limit);
-    const animeData = await animeModel.story.getAnyTimeAnimeStories(start, end);
+    let animeData = await animeModel.story.getAnyTimeAnimeStories(start, end);
+    animeData = animeData.map((anime)=>{ return anime.dataValues });
     console.log(animeData);
     res.header('Content-Type', 'application/json');
       let res_body = {
