@@ -1,4 +1,6 @@
 "use strict";
+const moment = require('moment');
+const lib = require('./lib');
 
 // アニメの全話数情報を取得
 exports.getAnyDay = (router, animeModel) => {
@@ -18,5 +20,29 @@ exports.getAnyDay = (router, animeModel) => {
       };
       res.send(res_body);
     });
+  });
+}
+
+// 本日放送のアニメ情報を返す
+exports.getNowAnime = (router, animeModel) => {
+  router.get("/getNowAnime/:limit", async (req, res)=>{
+    const now = moment();
+    const limit = req.params.limit;
+    const start = moment(now).add('minutes', 1);
+    const end = moment(now).add('minutes', limit);
+    const animeData = await animeModel.story.getAnyTimeAnimeStories(start, end);
+    const tidList = animeData.map((anime)=>{ return anime.tid });
+    const animeAbout = await animeModel.about.getAnimeList(tidList);
+    let animeConect = lib.assignAnimeAboutAndStory(animeAbout, animeData);
+    animeConect = animeConect.map((anime)=>{
+      anime.limitSecond = anime.stTime - now.unix();
+      return anime;
+    })
+    res.header('Content-Type', 'application/json');
+      let res_body = {
+        status: 'ok',
+        body: animeConect
+      };
+      res.send(res_body);
   });
 }
