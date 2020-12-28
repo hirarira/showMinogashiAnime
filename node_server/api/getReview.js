@@ -1,4 +1,5 @@
 "use strict";
+const cors = require('cors');
 
 // アニメ概要Listと評価Listをマージして返す
 function mergeAnimeInfo(animeAboutList, reviewList) {
@@ -56,7 +57,7 @@ exports.getOne = (router, animeModel) => {
 
 // 特定の視聴月に一致するレビューを取得する
 exports.getWatchDate = (router, animeModel) => {
-  router.get("/getWatchDate/:watchDate", async (req, res)=>{
+  router.get("/getWatchDate/:watchDate", cors(), async (req, res)=>{
     const watchDate = req.params.watchDate;
     const reviewList = await animeModel.review.getWatchDateAnimes(watchDate);
     const tidList = reviewList.map((anime)=>{
@@ -75,7 +76,7 @@ exports.getWatchDate = (router, animeModel) => {
 
 // 特定の得点のアニメレビューを取得する
 exports.getRoundRate = (router, animeModel) => {
-  router.get("/getRoundRate/:highLimit/:lowLimit", async (req, res)=>{
+  router.get("/getRoundRate/:highLimit/:lowLimit", cors(), async (req, res)=>{
     const lowLimit = req.params.lowLimit;
     const highLimit = req.params.highLimit;
     const reviewList = await animeModel.review.getRateAnimeReview(lowLimit, highLimit);
@@ -95,7 +96,7 @@ exports.getRoundRate = (router, animeModel) => {
 
 // 全件のレビューを返す
 exports.getAll = (router, animeModel) => {
-  router.get("/getAllAnimeReview", async (req, res)=>{
+  router.get("/getAllAnimeReview", cors(), async (req, res)=>{
     const reviewList = await animeModel.review.getAllAnimeReview();
     const animeAboutList = await animeModel.about.getAllAnime();
     const animeList = mergeAnimeInfo(animeAboutList, reviewList);
