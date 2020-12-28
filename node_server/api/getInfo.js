@@ -1,5 +1,6 @@
 "use strict";
 const moment = require('moment');
+const lib = require('./lib');
 
 // アニメの全話数情報を取得
 exports.getAnyDay = (router, animeModel) => {
@@ -29,13 +30,18 @@ exports.getNowAnime = (router, animeModel) => {
     const limit = req.params.limit;
     const start = moment(now).add('minutes', 1);
     const end = moment(now).add('minutes', limit);
-    let animeData = await animeModel.story.getAnyTimeAnimeStories(start, end);
-    animeData = animeData.map((anime)=>{ return anime.dataValues });
-    console.log(animeData);
+    const animeData = await animeModel.story.getAnyTimeAnimeStories(start, end);
+    const tidList = animeData.map((anime)=>{ return anime.tid });
+    const animeAbout = await animeModel.about.getAnimeList(tidList);
+    let animeConect = lib.assignAnimeAboutAndStory(animeAbout, animeData);
+    animeConect = animeConect.map((anime)=>{
+      anime.limitSecond = anime.stTime - now.unix();
+      return anime;
+    })
     res.header('Content-Type', 'application/json');
       let res_body = {
         status: 'ok',
-        body: animeData
+        body: animeConect
       };
       res.send(res_body);
   });
