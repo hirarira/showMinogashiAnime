@@ -74,6 +74,8 @@ exports.getAnyDay = (router, animeModel) => {
       // DB未登録のリスト
       let noRegistrationStoryList = [];
       for(let anime of animeList['items']){
+        // subTitleはnullの場合があるので対応
+        const registAnimeSubTitle = anime.SubTitle? anime.SubTitle: '';
         let isNoMatch = true;
         for(let story of response){
           if(anime.TID == story.dataValues.tid && anime.Count == story.dataValues.count){
@@ -87,7 +89,7 @@ exports.getAnyDay = (router, animeModel) => {
               let options = {
                 tid: story.dataValues.tid,
                 count: story.dataValues.count,
-                subTitle: anime.SubTitle
+                subTitle: registAnimeSubTitle
               }
               console.log(options);
               animeModel.story.updateSubTitle(options);
@@ -104,7 +106,7 @@ exports.getAnyDay = (router, animeModel) => {
             stTime: anime.StTime,
             edTime: anime.EdTime,
             lastUpdate: anime.LastUpdate,
-            subTitle: anime.SubTitle
+            subTitle: registAnimeSubTitle
           }
           noRegistrationStoryList.push(ngStory);
         }
