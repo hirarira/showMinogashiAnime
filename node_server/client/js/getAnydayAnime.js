@@ -106,8 +106,6 @@
         getShoboi: function(e) {
           let startDateFormat = date_format(this.startDate);
           let endDateFormat = date_format(this.endDate);
-          console.log(startDateFormat);
-          console.log(endDateFormat);
           getAjaxShoboiAnimedata(startDateFormat, endDateFormat, ()=>{
             getAjaxAnimedata(this.startDate, this.endDate, this.list);
           });
