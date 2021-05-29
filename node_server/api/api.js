@@ -65,6 +65,10 @@ getReview.getAll(router, animeModel);
 // GET /getAnimeStoryList/:tid
 getInfo.getAnyDay(router, animeModel);
 
+// DB完結で任意の時間のアニメ情報を返す
+// GET /getAnimeAnyDay/:start/:end
+getInfo.getOnlyDBAnyAnime(router, animeModel);
+
 // 数分後に放送するアニメ情報を返す
 // GET /getNowAnime/:limit
 getInfo.getNowAnime(router, animeModel);

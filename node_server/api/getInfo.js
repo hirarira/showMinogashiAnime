@@ -48,7 +48,7 @@ exports.getNowAnime = (router, animeModel) => {
 }
 
 // 任意の時刻のアニメ情報を返すエンドポイント
-exports.getNowAnime = (router, animeModel) => {
+exports.getOnlyDBAnyAnime = (router, animeModel) => {
   router.get("/getAnimeAnyDay/:start/:end", async (req, res)=>{
     const now = moment();
     const startQuery = req.params.start;
