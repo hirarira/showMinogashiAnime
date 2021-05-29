@@ -46,3 +46,28 @@ exports.getNowAnime = (router, animeModel) => {
       res.send(res_body);
   });
 }
+
+// 任意の時刻のアニメ情報を返すエンドポイント
+exports.getNowAnime = (router, animeModel) => {
+  router.get("/getAnimeAnyDay/:start/:end", async (req, res)=>{
+    const now = moment();
+    const startQuery = req.params.start;
+    const endQuery = req.params.end;
+    const start = moment(new Date(Number(startQuery)));
+    const end = moment(new Date(Number(endQuery)));
+    const animeData = await animeModel.story.getAnyTimeAnimeStories(start, end);
+    const tidList = animeData.map((anime)=>{ return anime.tid });
+    const animeAbout = await animeModel.about.getAnimeList(tidList);
+    let animeConect = lib.assignAnimeAboutAndStory(animeAbout, animeData);
+    animeConect = animeConect.map((anime)=>{
+      anime.limitSecond = anime.stTime - now.unix();
+      return anime;
+    })
+    res.header('Content-Type', 'application/json');
+      let res_body = {
+        status: 'ok',
+        body: animeConect
+      };
+      res.send(res_body);
+  });
+}

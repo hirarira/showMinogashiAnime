@@ -7,7 +7,6 @@ const AnimeStory = require('./model/animeStory.js');
 const DBSetting = require('./model/dbSetting.js');
 
 const sequelize = DBSetting();
-let moment = require('moment');
 
 const animeModel = {
   review: new AnimeReview(sequelize),
