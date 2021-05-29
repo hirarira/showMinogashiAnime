@@ -17,27 +17,19 @@
     });
   }
 
-  function getAjaxShoboiAnimedata(start, end, AnimeDataSet){
-    AnimeDataSet.splice(0, AnimeDataSet.length);
+  function getAjaxShoboiAnimedata(startDateFormat, endDateFormat, callback){
     // UPSFlag
     let in_url = "./api/getShoboiAnimeAnyDay";
-    $.get(in_url,{
+    $.get(in_url, {
       filter: 1,
       alt: "json",
       start: startDateFormat,
       end: endDateFormat
     },(importAnimeSet)=>{
       console.log(importAnimeSet);
-      getAjaxAnimedata();
-      /*
-      for(let i=0;i< importAnimeSet.items.length; i++){
-        AnimeDataSet.push( new AnimeData(i, importAnimeSet.items[i]) );
-      }
-      */
+      callback();
     });
   }
-
-
 
   window.onload = (()=>{
     const START_DATE = 5;
@@ -112,11 +104,13 @@
           });
         },
         getShoboi: function(e) {
-          this.setDateFunc();
           let startDateFormat = date_format(this.startDate);
           let endDateFormat = date_format(this.endDate);
           console.log(startDateFormat);
           console.log(endDateFormat);
+          getAjaxShoboiAnimedata(startDateFormat, endDateFormat, ()=>{
+            getAjaxAnimedata(this.startDate, this.endDate, this.list);
+          });
         }
       }
     });

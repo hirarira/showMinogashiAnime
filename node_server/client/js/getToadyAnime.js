@@ -38,7 +38,6 @@
   let now = moment().add(-5, 'hours');
   let tomorrow = moment().add(-5, 'hours').add(1, 'days');
   // UPSFlag
-  // let in_url_x = "./api/getShoboiAnimeAnyDay";
   let in_url = `./api/getAnimeAnyDay/${now.unix()*1000}/${tomorrow.unix()*1000}`;
   $.get(in_url, (importAnimeSet)=>{
     for(let i=0; i<importAnimeSet.body.length; i++){
