@@ -38,17 +38,10 @@
    let start = moment().add(-5, 'hours').add(-1, 'days');
    let end = moment().add(-5, 'hours');
   // UPSFlag
-  let in_url = "./api/getShoboiAnimeAnyDay";
-  console.log(in_url);
-  $.get(in_url,{
-    filter: 1,
-    alt: "json",
-    start: start.format("YYYYMMDD0500"),
-    end: end.format("YYYYMMDD0500")
-  },(importAnimeSet)=>{
-    for(let i=0;i<importAnimeSet.items.length;i++){
-      AnimeDataSet.push( new AnimeData(i, importAnimeSet.items[i]) );
+  let in_url = `./api/getAnimeAnyDay/${start.unix()*1000}/${end.unix()*1000}`;
+  $.get(in_url, (importAnimeSet)=>{
+    for(let i=0;i<importAnimeSet.body.length;i++){
+      AnimeDataSet.push( new AnimeData(i, importAnimeSet.body[i]) );
     }
-    console.log(AnimeDataSet);
   });
 })();

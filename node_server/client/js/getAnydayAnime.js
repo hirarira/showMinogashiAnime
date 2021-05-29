@@ -6,19 +6,13 @@
     ('0'+date.getHours()).slice(-2) + ('0'+date.getMinutes()).slice(-2);
   }
 
-  function getAjaxAnimedata(startDateFormat, endDateFormat, AnimeDataSet){
+  function getAjaxAnimedata(start, end, AnimeDataSet){
     AnimeDataSet.splice(0, AnimeDataSet.length);
     // UPSFlag
-    let in_url = "./api/getShoboiAnimeAnyDay";
-    $.get(in_url,{
-      filter: 1,
-      alt: "json",
-      start: startDateFormat,
-      end: endDateFormat
-    },(importAnimeSet)=>{
-      console.log(importAnimeSet);
-      for(let i=0;i<importAnimeSet.items.length;i++){
-        AnimeDataSet.push( new AnimeData(i, importAnimeSet.items[i]) );
+    let in_url = `./api/getAnimeAnyDay/${start.getTime()}/${end.getTime()}`;
+    $.get(in_url ,(importAnimeSet)=>{
+      for(let i=0;i<importAnimeSet.body.length;i++){
+        AnimeDataSet.push( new AnimeData(i, importAnimeSet.body[i]) );
       }
     });
   }
@@ -79,9 +73,7 @@
           this.getAjax();
         },
         getAjax: function(){
-          let startDateFormat = date_format(this.startDate);
-          let endDateFormat = date_format(this.endDate);
-          getAjaxAnimedata(startDateFormat, endDateFormat, this.list);
+          getAjaxAnimedata(this.startDate, this.endDate, this.list);
         },
         changeMinogashi: function(e){
           e.minogashi = !e.minogashi;
