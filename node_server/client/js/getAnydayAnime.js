@@ -17,6 +17,28 @@
     });
   }
 
+  function getAjaxShoboiAnimedata(start, end, AnimeDataSet){
+    AnimeDataSet.splice(0, AnimeDataSet.length);
+    // UPSFlag
+    let in_url = "./api/getShoboiAnimeAnyDay";
+    $.get(in_url,{
+      filter: 1,
+      alt: "json",
+      start: startDateFormat,
+      end: endDateFormat
+    },(importAnimeSet)=>{
+      console.log(importAnimeSet);
+      getAjaxAnimedata();
+      /*
+      for(let i=0;i< importAnimeSet.items.length; i++){
+        AnimeDataSet.push( new AnimeData(i, importAnimeSet.items[i]) );
+      }
+      */
+    });
+  }
+
+
+
   window.onload = (()=>{
     const START_DATE = 5;
     let app = new Vue({
@@ -35,6 +57,20 @@
       methods:{
         minogashi: function(url){
           return url;
+        },
+        setDateFunc: function(e) {
+          this.startDate = new Date(
+            this.setDate.split("-")[0],
+            this.setDate.split("-")[1] - 1,
+            this.setDate.split("-")[2],
+            START_DATE
+          );
+          this.endDate = new Date(
+            this.startDate.getFullYear(),
+            this.startDate.getMonth(),
+            this.startDate.getDate() + 1,
+            this.startDate.getHours()
+          );
         },
         beforeDay: function(e){
           this.startDate.setDate(this.startDate.getDate() - 1);
@@ -58,18 +94,7 @@
         },
         searchAnime: function(e){
           console.log(this.setDate);
-          this.startDate = new Date(
-            this.setDate.split("-")[0],
-            this.setDate.split("-")[1] - 1,
-            this.setDate.split("-")[2],
-            START_DATE
-          );
-          this.endDate = new Date(
-            this.startDate.getFullYear(),
-            this.startDate.getMonth(),
-            this.startDate.getDate() + 1,
-            this.startDate.getHours()
-          );
+          this.setDateFunc();
           this.getAjax();
         },
         getAjax: function(){
@@ -85,6 +110,13 @@
           },(res)=>{
             console.log(res);
           });
+        },
+        getShoboi: function(e) {
+          this.setDateFunc();
+          let startDateFormat = date_format(this.startDate);
+          let endDateFormat = date_format(this.endDate);
+          console.log(startDateFormat);
+          console.log(endDateFormat);
         }
       }
     });

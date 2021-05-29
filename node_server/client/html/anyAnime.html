@@ -58,6 +58,7 @@
       <button v-on:click="beforeDay" class="btn btn-primary">前の日</button>
       <button v-on:click="afterDay" class="btn btn-primary">次の日</button>
       <button v-on:click="afterWeek" class="btn btn-primary">来週</button>
+      <button v-on:click="getShoboi" class="btn btn-primary">しょぼいカレンダーから取得</button>
       <hr>
       <h2 class="text-center"> {{startDate.getMonth()+1}} / {{startDate.getDate()}} ( {{youbi[ startDate.getDay() ]}} ) のアニメ </h2>
       <table class="table table-hover table-bordered">
