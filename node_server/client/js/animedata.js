@@ -17,7 +17,7 @@ class AnimeData{
     this.comment = in_set.comment;
     this.url = in_set.url;
     this.characterURL = in_set.characterURL;
-    this.topUrl = this.url;
+    this.topUrl = this.url? this.url.split('\t')[0]: '';
     this.minogashi_sb = (in_set.minogashi==1);
     this.tid = in_set.tid;
     this.subtitleListUrl = "http://cal.syoboi.jp/tid/"+this.tid+"/subtitle";
