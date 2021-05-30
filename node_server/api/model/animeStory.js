@@ -92,7 +92,7 @@ module.exports = class{
   /**
    * 指定の期間のアニメの各話を取得する
    * @param date start 
-   * @param fate end 
+   * @param date end 
    */
   getAnyTimeAnimeStories(start, end) {
     return this.model.findAll({

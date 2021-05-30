@@ -7,7 +7,6 @@ const AnimeStory = require('./model/animeStory.js');
 const DBSetting = require('./model/dbSetting.js');
 
 const sequelize = DBSetting();
-let moment = require('moment');
 
 const animeModel = {
   review: new AnimeReview(sequelize),
@@ -65,6 +64,10 @@ getReview.getAll(router, animeModel);
 // アニメの全話数情報を取得
 // GET /getAnimeStoryList/:tid
 getInfo.getAnyDay(router, animeModel);
+
+// DB完結で任意の時間のアニメ情報を返す
+// GET /getAnimeAnyDay/:start/:end
+getInfo.getOnlyDBAnyAnime(router, animeModel);
 
 // 数分後に放送するアニメ情報を返す
 // GET /getNowAnime/:limit

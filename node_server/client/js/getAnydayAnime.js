@@ -6,20 +6,28 @@
     ('0'+date.getHours()).slice(-2) + ('0'+date.getMinutes()).slice(-2);
   }
 
-  function getAjaxAnimedata(startDateFormat, endDateFormat, AnimeDataSet){
+  function getAjaxAnimedata(start, end, AnimeDataSet){
     AnimeDataSet.splice(0, AnimeDataSet.length);
     // UPSFlag
+    let in_url = `./api/getAnimeAnyDay/${start.getTime()}/${end.getTime()}`;
+    $.get(in_url ,(importAnimeSet)=>{
+      for(let i=0;i<importAnimeSet.body.length;i++){
+        AnimeDataSet.push( new AnimeData(i, importAnimeSet.body[i]) );
+      }
+    });
+  }
+
+  function getAjaxShoboiAnimedata(startDateFormat, endDateFormat, callback){
+    // UPSFlag
     let in_url = "./api/getShoboiAnimeAnyDay";
-    $.get(in_url,{
+    $.get(in_url, {
       filter: 1,
       alt: "json",
       start: startDateFormat,
       end: endDateFormat
     },(importAnimeSet)=>{
       console.log(importAnimeSet);
-      for(let i=0;i<importAnimeSet.items.length;i++){
-        AnimeDataSet.push( new AnimeData(i, importAnimeSet.items[i]) );
-      }
+      callback();
     });
   }
 
@@ -41,6 +49,20 @@
       methods:{
         minogashi: function(url){
           return url;
+        },
+        setDateFunc: function(e) {
+          this.startDate = new Date(
+            this.setDate.split("-")[0],
+            this.setDate.split("-")[1] - 1,
+            this.setDate.split("-")[2],
+            START_DATE
+          );
+          this.endDate = new Date(
+            this.startDate.getFullYear(),
+            this.startDate.getMonth(),
+            this.startDate.getDate() + 1,
+            this.startDate.getHours()
+          );
         },
         beforeDay: function(e){
           this.startDate.setDate(this.startDate.getDate() - 1);
@@ -64,24 +86,11 @@
         },
         searchAnime: function(e){
           console.log(this.setDate);
-          this.startDate = new Date(
-            this.setDate.split("-")[0],
-            this.setDate.split("-")[1] - 1,
-            this.setDate.split("-")[2],
-            START_DATE
-          );
-          this.endDate = new Date(
-            this.startDate.getFullYear(),
-            this.startDate.getMonth(),
-            this.startDate.getDate() + 1,
-            this.startDate.getHours()
-          );
+          this.setDateFunc();
           this.getAjax();
         },
         getAjax: function(){
-          let startDateFormat = date_format(this.startDate);
-          let endDateFormat = date_format(this.endDate);
-          getAjaxAnimedata(startDateFormat, endDateFormat, this.list);
+          getAjaxAnimedata(this.startDate, this.endDate, this.list);
         },
         changeMinogashi: function(e){
           e.minogashi = !e.minogashi;
@@ -92,6 +101,13 @@
             comment: e.comment
           },(res)=>{
             console.log(res);
+          });
+        },
+        getShoboi: function(e) {
+          let startDateFormat = date_format(this.startDate);
+          let endDateFormat = date_format(this.endDate);
+          getAjaxShoboiAnimedata(startDateFormat, endDateFormat, ()=>{
+            getAjaxAnimedata(this.startDate, this.endDate, this.list);
           });
         }
       }

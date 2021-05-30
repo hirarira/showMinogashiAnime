@@ -1,0 +1,15 @@
+version: '3.1'
+
+services:
+  mariadb:
+    image: mariadb:latest
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+    restart: always
+    environment:
+      MYSQL_DATABASE: anime
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: mariadb
+      MYSQL_ROOT_PASSWORD: mariadb
+    ports:
+      - "3306:3306"
