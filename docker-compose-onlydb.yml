@@ -5,6 +5,7 @@ services:
     image: mariadb:latest
     volumes:
       - ./sql:/docker-entrypoint-initdb.d
+      - ./sql/tmp:/sql_tmp
     restart: always
     environment:
       MYSQL_DATABASE: anime
@@ -13,3 +14,14 @@ services:
       MYSQL_ROOT_PASSWORD: mariadb
     ports:
       - "3306:3306"
+  phpmyadmin:
+    image: phpmyadmin:latest
+    depends_on:
+      - mariadb
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOSTS=mariadb
+      - PMA_USER=admin
+      - PMA_PASSWORD=mariadb
+    ports:
+      - "3001:80"
