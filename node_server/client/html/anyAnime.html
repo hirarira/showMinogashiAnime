@@ -10,38 +10,35 @@
     <link rel="stylesheet" type="text/css" href="./css/style.css">
     <title>アニメ関連</title>
   </head>
-  <body>
+  <body class="main">
     <!-- メニューここから -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">menu</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-secondary">
+      <span class="navbar-brand text-light">menu</span>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
           <li class="nav-item">
-            <a class="nav-link" href="./index.html">アニメTOP</a>
+            <a class="nav-link text-light" href="./index.html">アニメTOP</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="./todayAnime.html">今日のアニメ一覧</a>
+            <a class="nav-link text-light" href="./todayAnime.html">今日のアニメ一覧</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="./yesterdayAnime.html">昨日のアニメ一覧</a>
+            <a class="nav-link text-light" href="./yesterdayAnime.html">昨日のアニメ一覧</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="./minogashi.html">見逃しアニメ一覧</a>
+            <a class="nav-link text-light" href="./minogashi.html">見逃しアニメ一覧</a>
           </li>
           <li class="nav-item active">
-            <a class="nav-link" href="./anyAnime.html">任意の日のアニメ</a>
+            <a class="nav-link text-light" href="./anyAnime.html">任意の日のアニメ</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="./minogashiALL.html">見逃しアニメ一覧（全期間）</a>
+            <a class="nav-link text-light" href="./minogashiALL.html">見逃しアニメ一覧（全期間）</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="./noCommentList.html">コメントなしアニメ一覧</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="../../apache/list/">Listに戻る</a>
+            <a class="nav-link text-light" href="./noCommentList.html">コメントなしアニメ一覧</a>
           </li>
         </ul>
       </div>
@@ -61,7 +58,7 @@
       <button v-on:click="getShoboi" class="btn btn-primary">しょぼいカレンダーから取得</button>
       <hr>
       <h2 class="text-center"> {{startDate.getMonth()+1}} / {{startDate.getDate()}} ( {{youbi[ startDate.getDay() ]}} ) のアニメ </h2>
-      <table class="table table-hover table-bordered">
+      <table class="table table-hover table-bordered bg-white">
         <thead>
           <tr>
             <th scope="col" class="text-nowrap">ID</th>

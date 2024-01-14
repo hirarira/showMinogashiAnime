@@ -23,6 +23,7 @@ app.use("/", Express.static(__dirname  + '/client/html'));
 app.use("/bootstrap", Express.static(__dirname  + '/client/bootstrap'));
 app.use("/css", Express.static(__dirname  + '/client/css'));
 app.use("/js", Express.static(__dirname  + '/client/js'));
+app.use("/img", Express.static(__dirname  + '/client/img'));
 
 let api = require('./api/api.js');
 app.use('/api', api);

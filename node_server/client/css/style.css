@@ -5,3 +5,7 @@ h3 {
 .load {
   text-align: center;
 }
+
+.main {
+  background-image: url("/img/angel_bg_8.png");
+}
