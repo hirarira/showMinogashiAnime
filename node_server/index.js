@@ -1,7 +1,11 @@
 "use strict";
+
+require('dotenv').config();
+
 const Express = require("express");
 const BodyParser = require('body-parser');
 const app = Express();
+
 const username = process.env.ANIME_SHOBOI_CALENDAR_USERNAME;
 
 // urlencodedとjsonは別々に初期化する
