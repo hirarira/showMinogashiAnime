@@ -21,7 +21,8 @@
         hashTag: null,
         publicURL: null,
         characterURL: null,
-        getShoboiReult: null
+        getShoboiReult: null,
+        errorMessage: null
       },
       methods:{
         updateComment: function(){
@@ -76,6 +77,7 @@
         }
       }
     });
+
     try{
       if(typeof paramsStr === 'undefined'){
         throw new Error("必要なパラメータ"+needParams+"がないです");
@@ -88,6 +90,7 @@
         throw new Error("必要なパラメーター["+needParams[param]+"]がないです");
       }
       app.sb_url = "http://cal.syoboi.jp/tid/" + params.tid;
+      app.tid = params.tid;
       // Ajaxで該当するのを取得
       $.ajax({
         type: 'GET',
@@ -95,17 +98,16 @@
         dataType: 'json'
       })
       .done((res)=>{
-        console.log(res['status']);
-        if( res['status'] !== 'ok' ){
+        if( res.status !== 'ok' || !res.body.about ){
           app.error = "該当するアニメがありません。";
           return;
         }
-        app.anime = res['body'];
-        for(let i=0; i<app.anime['story'].length; i++){
-          app.anime['story'][i].commentURL = "./setComment.html?tid="+app.anime['story'][i].tid+"&count="+app.anime['story'][i].count;
-          app.anime['story'][i].startTime = new Date(Number(app.anime['story'][i].stTime * 1000));
-          if(app.anime['story'][i].subTitle === ''　|| app.anime['story'][i].subTitle === null){
-            app.anime['story'][i].subTitle = '(サブタイなし)';
+        app.anime = res.body;
+        for(let i=0; i<app.anime.story.length; i++){
+          app.anime.story[i].commentURL = "./setComment.html?tid="+app.anime.story[i].tid+"&count="+app.anime.story[i].count;
+          app.anime.story[i].startTime = new Date(Number(app.anime.story[i].stTime * 1000));
+          if(app.anime.story[i].subTitle === '' || app.anime.story[i].subTitle === null){
+            app.anime.story[i].subTitle = '(サブタイなし)';
           }
         }
         $.ajax({
@@ -118,10 +120,18 @@
           app.loading = false;
         });
         // 基礎情報を入れていく
-        app.tid = app.anime['about'].tid;
-        app.hashTag = app.anime['about'].hashTag;
-        app.publicURL = app.anime['about'].publicURL == "" ? app.anime['about'].url.split('	')['about'] : app.anime['about'].publicURL;
-        app.characterURL = app.anime['about'].characterURL;
+        if(app.anime && app.anime.about) {
+          app.tid = app.anime.about.tid;
+          app.hashTag = app.anime.about.hashTag;
+          app.publicURL = app.anime.about.publicURL == "" ?
+            app.anime.about.url.split('	')['about']:
+            app.anime.about.publicURL;
+          app.characterURL = app.anime.about.characterURL;
+        }
+        else {
+          app.tid = params.tid;
+          app.error = "アニメ概要情報がありません！";
+        }
       })
       .fail((e)=>{
         app.error = e.toString();
