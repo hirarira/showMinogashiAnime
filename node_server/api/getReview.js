@@ -45,11 +45,21 @@ exports.getOne = (router, animeModel) => {
         });
       }
       else{
-        let res_body = {
-          status: 'ok',
-          body: Object.assign(db_data[0][0].dataValues, db_data[1][0].dataValues)
-        };
-        res.send(res_body);
+        // アニメ概要がない場合には新規作成する
+        if(db_data[1].length) {
+          const res_body = {
+            status: 'ok',
+            body: Object.assign(db_data[0][0].dataValues, db_data[1][0].dataValues)
+          };
+          res.send(res_body);
+        }
+        else {
+          const res_body = {
+            status: 'ng',
+            body: "アニメ概要がありません"
+          };
+          res.send(res_body);
+        }
       }
     })
   });

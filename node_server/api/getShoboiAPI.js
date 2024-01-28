@@ -6,7 +6,6 @@ const parser = require('fast-xml-parser');
 /**
  * しょぼいカレンダーAPIにアクセスするルーティングを実装する
  */
-
  // しょぼいカレンダーより任意の日付の見るアニメを取得
 exports.getAnyDay = (router, animeModel) => {
   router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
@@ -44,7 +43,7 @@ exports.getAnyDay = (router, animeModel) => {
         }
         // アニメの概要がなければDBに登録
         if(match === null){
-          let options = {
+          const options = {
             tid: animeList['items'][i]['TID'],
             title: animeList['items'][i]['Title'],
             chName: animeList['items'][i]['ChName'],
@@ -122,87 +121,93 @@ exports.getAnyDay = (router, animeModel) => {
 }
 
 // 未登録のアニメのサブタイを取得して登録
-exports.getNoRegistStories = (router, animeModel) => {
-  router.get("/getNoRegistStories/:tid", (req, res)=>{
-    const base_url = "http://cal.syoboi.jp/db.php?Command=TitleLookup&TID=";
-    const tid = req.params.tid;
-    const url = base_url + tid;
-    let storyList = [];
-    let baseStory = {
-      tid: tid,
-      count: null,
-      stTime: 0,
-      edTime: 0,
-      lastUpdate: 0,
-      subTitle: ''
-    }
-    // ベースとなるレスポンス
-    let res_body = {
-      status: 'ok',
-      comment: '',
-      regStories: []
-    };
-  
-    request.get({
-      url: url
-    })
-    .then((stories)=>{
-      let json = parser.parse(stories);
-      let titleItem = json['TitleLookupResponse']['TitleItems']['TitleItem'];
-      let subTitleLines = titleItem['SubTitles'].split("\r\n");
+exports.getNoRegistStories = async (router, animeModel) => {
+  router.get("/getNoRegistStories/:tid", async (req, res)=>{
+    try {
+      const base_url = "http://cal.syoboi.jp/db.php?Command=TitleLookup&TID=";
+      const tid = req.params.tid;
+      const url = base_url + tid;
+      const storyList = [];
+      const baseStory = {
+        tid: tid,
+        count: null,
+        stTime: 0,
+        edTime: 0,
+        lastUpdate: 0,
+        subTitle: ''
+      }
+      // ベースとなるレスポンス
+      const res_body = {
+        status: 'ok',
+        comment: '',
+        regStories: []
+      };
+    
+      const stories = await request.get({
+        url: url
+      })
+      const json = parser.parse(stories);
+      const titleItem = json['TitleLookupResponse']['TitleItems']['TitleItem'];
+      const subTitleLines = titleItem['SubTitles'].split("\r\n");
+      let regResult = 0
       for(let i in subTitleLines){
         storyList.push( subTitleLines[i].split(/\*(.*?)\*/).filter(e => e) );
       }
-      return animeModel.story.getAllAnimeStory(tid);
-    })
-    .then((noRegStoriesDefault)=>{
+      const noRegStoriesDefault = await animeModel.story.getAllAnimeStory(tid);
       res.header('Content-Type', 'application/json');
       let registStoryList = noRegStoriesDefault.map(x => x['dataValues']);
       let existStoryList = registStoryList.map(x => x['count']);
-      // 1話も登録されていない場合にはエラーとする
+      // 1話も登録されていない場合にはアニメ概要を登録する
       if(existStoryList.length <= 0){
-        return 1;
+        const noRegistAnimeAbout = {
+          tid: titleItem.TID,
+          title: titleItem.Title,
+          chName: "",
+          url: ""
+        }
+        const regNewAnime = await animeModel.about.insertAnimeAbout(noRegistAnimeAbout);
+        regResult = 1;
       }
-      let noRegStories = [];
-      let updateStories = [];
-      for(let i=0; i<storyList.length; i++){
-        // DB上に含まれてるかチェック
-        storyList[i][0] = Number(storyList[i][0])
-        if(existStoryList.indexOf( storyList[i][0] ) == -1){
-          let noRegStory = Object.assign({}, baseStory);
-          noRegStory['count'] = storyList[i][0];
-          noRegStory['subTitle'] = storyList[i][1];
-          noRegStories.push(noRegStory);
+      else {
+        let noRegStories = [];
+        let updateStories = [];
+        for(let i=0; i<storyList.length; i++){
+          // DB上に含まれてるかチェック
+          storyList[i][0] = Number(storyList[i][0])
+          if(existStoryList.indexOf( storyList[i][0] ) == -1){
+            let noRegStory = Object.assign({}, baseStory);
+            noRegStory['count'] = storyList[i][0];
+            noRegStory['subTitle'] = storyList[i][1];
+            noRegStories.push(noRegStory);
+          }
+          else{
+            // DB上のサブタイが最新のものかチェック
+            let registedStory = registStoryList.find(x => x.count == storyList[i][0]);
+            // DB上のサブタイとAPI取得のサブタイが異なる場合
+            if(registedStory && (storyList[i][1] != registedStory.subTitle)){
+              updateStories.push({
+                tid: registedStory.tid,
+                count: registedStory.count,
+                subTitle: storyList[i][1]
+              });
+            }
+          }
+        }
+        // 登録するアニメがない場合
+        if(noRegStories.length == 0 && updateStories.length == 0){
+          regResult = 2;
         }
         else{
-          // DB上のサブタイが最新のものかチェック
-          let registedStory = registStoryList.find(x => x.count == storyList[i][0]);
-          // DB上のサブタイとAPI取得のサブタイが異なる場合
-          if(registedStory && (storyList[i][1] != registedStory.subTitle)){
-            updateStories.push({
-              tid: registedStory.tid,
-              count: registedStory.count,
-              subTitle: storyList[i][1]
-            });
+          for(let i=0; i<updateStories.length; i++){
+            // アニメのサブタイを更新（返り値は無視）
+            animeModel.story.updateSubTitle(updateStories[i]);
+          }
+          if(noRegStories.length != 0){
+            res_body['regStories'] = noRegStories;
+            regResult = animeModel.story.insertAnimeStories(noRegStories);
           }
         }
       }
-      // 登録するアニメがない場合
-      if(noRegStories.length == 0 && updateStories.length == 0){
-        return 2;
-      }
-      else{
-        for(let i=0; i<updateStories.length; i++){
-          // アニメのサブタイを更新（返り値は無視）
-          animeModel.story.updateSubTitle(updateStories[i]);
-        }
-        if(noRegStories.length != 0){
-          res_body['regStories'] = noRegStories;
-          return animeModel.story.insertAnimeStories(noRegStories);
-        }
-      }
-    })
-    .then((regResult)=>{
       switch (regResult) {
         case 1:
           res.status(400);
@@ -218,6 +223,16 @@ exports.getNoRegistStories = (router, animeModel) => {
       }
       res_body['date'] = new Date();
       res.send(res_body);
-    });
+    }
+    catch(e) {
+      console.error(e);
+      res.status(500);
+      const res_body = {
+        status: 'ng',
+        comment: '予想外のエラーが発生しました',
+        date: new Date()
+      };
+      res.send(res_body);
+    }
   });
 }
