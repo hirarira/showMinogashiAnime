@@ -120,12 +120,23 @@ exports.getAnyDay = (router, animeModel) => {
   });
 }
 
+class AnimeRegistError extends Error {
+  constructor(message, errorCode) {
+    super(message);
+    this.message = message;
+    this.errorCode = errorCode;
+  }
+}
+
 // 未登録のアニメのサブタイを取得して登録
 exports.getNoRegistStories = async (router, animeModel) => {
   router.get("/getNoRegistStories/:tid", async (req, res)=>{
     try {
       const base_url = "http://cal.syoboi.jp/db.php?Command=TitleLookup&TID=";
       const tid = req.params.tid;
+      if(Number.isNaN(tid)) {
+        throw new AnimeRegistError(`TIDの値が異常です: ${tid}`, 0);
+      }
       const url = base_url + tid;
       const storyList = [];
       const baseStory = {
@@ -147,8 +158,17 @@ exports.getNoRegistStories = async (router, animeModel) => {
         url: url
       })
       const json = parser.parse(stories);
-      const titleItem = json['TitleLookupResponse']['TitleItems']['TitleItem'];
-      const subTitleLines = titleItem['SubTitles'].split("\r\n");
+      if(json.TitleLookupResponse.Result.Code === 400) {
+        console.log("url:");
+        console.log(url);
+        throw new AnimeRegistError(json.TitleLookupResponse.Result.Message, 4);
+      }
+      if(!json.TitleLookupResponse || !json.TitleLookupResponse.TitleItems) {
+        console.log(json);
+        throw new AnimeRegistError("json.TitleLookupResponse 要素がありません", 3);
+      }
+      const titleItem = json.TitleLookupResponse.TitleItems.TitleItem;
+      const subTitleLines = titleItem.SubTitles.split("\r\n");
       let regResult = 0
       for(let i in subTitleLines){
         storyList.push( subTitleLines[i].split(/\*(.*?)\*/).filter(e => e) );
@@ -166,7 +186,7 @@ exports.getNoRegistStories = async (router, animeModel) => {
           url: ""
         }
         const regNewAnime = await animeModel.about.insertAnimeAbout(noRegistAnimeAbout);
-        regResult = 1;
+        throw new AnimeRegistError("アニメが登録されていません", 1);
       }
       else {
         let noRegStories = [];
@@ -195,7 +215,7 @@ exports.getNoRegistStories = async (router, animeModel) => {
         }
         // 登録するアニメがない場合
         if(noRegStories.length == 0 && updateStories.length == 0){
-          regResult = 2;
+          throw new AnimeRegistError("アニメが登録されていません", 2);
         }
         else{
           for(let i=0; i<updateStories.length; i++){
@@ -208,31 +228,30 @@ exports.getNoRegistStories = async (router, animeModel) => {
           }
         }
       }
-      switch (regResult) {
-        case 1:
-          res.status(400);
-          res_body['status'] = 'ng';
-          res_body['comment'] = 'The anime is unregistered';
-          break;
-        case 2:
-          res_body['comment'] = 'There is no anime to register';
-          break;
-        default:
-          res_body['comment'] = 'All registered successfully';
-        break;
-      }
+      res_body['comment'] = 'All registered successfully';
       res_body['date'] = new Date();
       res.send(res_body);
     }
     catch(e) {
       console.error(e);
       res.status(500);
-      const res_body = {
-        status: 'ng',
-        comment: '予想外のエラーが発生しました',
-        date: new Date()
-      };
-      res.send(res_body);
+      if(e instanceof AnimeRegistError) {
+        const res_body = {
+          status: 'ng',
+          comment: e.message,
+          code: e.errorCode,
+          date: new Date()
+        };
+        res.send(res_body);
+      }
+      else {
+        const res_body = {
+          status: 'ng',
+          comment: '予想外のエラーが発生しました',
+          date: new Date()
+        };
+        res.send(res_body);
+      }
     }
   });
 }
