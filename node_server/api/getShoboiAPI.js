@@ -134,7 +134,7 @@ exports.getNoRegistStories = async (router, animeModel) => {
     try {
       const base_url = "http://cal.syoboi.jp/db.php?Command=TitleLookup&TID=";
       const tid = req.params.tid;
-      if(Number.isNaN(tid)) {
+      if(Number.isNaN(Number(tid))) {
         throw new AnimeRegistError(`TIDの値が異常です: ${tid}`, 0);
       }
       const url = base_url + tid;
@@ -153,82 +153,88 @@ exports.getNoRegistStories = async (router, animeModel) => {
         comment: '',
         regStories: []
       };
-    
+
       const stories = await request.get({
         url: url
       })
       const json = parser.parse(stories);
-      if(json.TitleLookupResponse.Result.Code === 400) {
-        console.log("url:");
-        console.log(url);
-        throw new AnimeRegistError(json.TitleLookupResponse.Result.Message, 4);
-      }
       if(!json.TitleLookupResponse || !json.TitleLookupResponse.TitleItems) {
         console.log(json);
         throw new AnimeRegistError("json.TitleLookupResponse 要素がありません", 3);
       }
+      if(json.TitleLookupResponse.Result && json.TitleLookupResponse.Result.Code === 400) {
+        console.log("url:");
+        console.log(url);
+        throw new AnimeRegistError(json.TitleLookupResponse.Result.Message, 4);
+      }
       const titleItem = json.TitleLookupResponse.TitleItems.TitleItem;
-      const subTitleLines = titleItem.SubTitles.split("\r\n");
-      let regResult = 0
+      // XMLパーサーは改行を \n に正規化するため、\r\n と \n のどちらにも対応する
+      const subTitleLines = (titleItem.SubTitles || '').split(/\r\n|\r|\n/);
       for(let i in subTitleLines){
+        if(!subTitleLines[i]) {
+          continue;
+        }
         storyList.push( subTitleLines[i].split(/\*(.*?)\*/).filter(e => e) );
       }
       const noRegStoriesDefault = await animeModel.story.getAllAnimeStory(tid);
       res.header('Content-Type', 'application/json');
       let registStoryList = noRegStoriesDefault.map(x => x['dataValues']);
       let existStoryList = registStoryList.map(x => x['count']);
-      // 1話も登録されていない場合にはアニメ概要を登録する
-      if(existStoryList.length <= 0){
+      // アニメ概要が未登録の場合のみ登録する
+      // （登録済みの概要を再登録すると一意制約違反でエラーになるため）
+      const existAbout = await animeModel.about.getAnime(tid);
+      if(existAbout.length <= 0){
         const noRegistAnimeAbout = {
           tid: titleItem.TID,
           title: titleItem.Title,
           chName: "",
           url: ""
         }
-        const regNewAnime = await animeModel.about.insertAnimeAbout(noRegistAnimeAbout);
-        throw new AnimeRegistError("アニメが登録されていません", 1);
+        await animeModel.about.insertAnimeAbout(noRegistAnimeAbout);
       }
-      else {
-        let noRegStories = [];
-        let updateStories = [];
-        for(let i=0; i<storyList.length; i++){
-          // DB上に含まれてるかチェック
-          storyList[i][0] = Number(storyList[i][0])
-          if(existStoryList.indexOf( storyList[i][0] ) == -1){
-            let noRegStory = Object.assign({}, baseStory);
-            noRegStory['count'] = storyList[i][0];
-            noRegStory['subTitle'] = storyList[i][1];
-            noRegStories.push(noRegStory);
-          }
-          else{
-            // DB上のサブタイが最新のものかチェック
-            let registedStory = registStoryList.find(x => x.count == storyList[i][0]);
-            // DB上のサブタイとAPI取得のサブタイが異なる場合
-            if(registedStory && (storyList[i][1] != registedStory.subTitle)){
-              updateStories.push({
-                tid: registedStory.tid,
-                count: registedStory.count,
-                subTitle: storyList[i][1]
-              });
-            }
-          }
+      let noRegStories = [];
+      let updateStories = [];
+      for(let i=0; i<storyList.length; i++){
+        // DB上に含まれてるかチェック
+        storyList[i][0] = Number(storyList[i][0])
+        if(Number.isNaN(storyList[i][0])){
+          continue;
         }
-        // 登録するアニメがない場合
-        if(noRegStories.length == 0 && updateStories.length == 0){
-          throw new AnimeRegistError("アニメが登録されていません", 2);
+        const storySubTitle = storyList[i][1] || '';
+        if(existStoryList.indexOf( storyList[i][0] ) == -1){
+          let noRegStory = Object.assign({}, baseStory);
+          noRegStory['count'] = storyList[i][0];
+          noRegStory['subTitle'] = storySubTitle;
+          noRegStories.push(noRegStory);
         }
         else{
-          for(let i=0; i<updateStories.length; i++){
-            // アニメのサブタイを更新（返り値は無視）
-            animeModel.story.updateSubTitle(updateStories[i]);
-          }
-          if(noRegStories.length != 0){
-            res_body['regStories'] = noRegStories;
-            regResult = animeModel.story.insertAnimeStories(noRegStories);
+          // DB上のサブタイが最新のものかチェック
+          let registedStory = registStoryList.find(x => x.count == storyList[i][0]);
+          // DB上のサブタイとAPI取得のサブタイが異なる場合
+          if(registedStory && (storySubTitle != registedStory.subTitle)){
+            updateStories.push({
+              tid: registedStory.tid,
+              count: registedStory.count,
+              subTitle: storySubTitle
+            });
           }
         }
       }
-      res_body['comment'] = 'All registered successfully';
+      // 登録・更新する話数がない場合は正常系として返す
+      if(noRegStories.length == 0 && updateStories.length == 0){
+        res_body['comment'] = '登録・更新する話数はありませんでした';
+      }
+      else{
+        for(let i=0; i<updateStories.length; i++){
+          // アニメのサブタイを更新
+          await animeModel.story.updateSubTitle(updateStories[i]);
+        }
+        if(noRegStories.length != 0){
+          res_body['regStories'] = noRegStories;
+          await animeModel.story.insertAnimeStories(noRegStories);
+        }
+        res_body['comment'] = 'All registered successfully';
+      }
       res_body['date'] = new Date();
       res.send(res_body);
     }
