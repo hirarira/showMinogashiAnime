@@ -1,7 +1,7 @@
 "use strict";
-const request = require('request-promise');
 const username = process.env.ANIME_SHOBOI_CALENDAR_USERNAME;
-const parser = require('fast-xml-parser');
+const { XMLParser } = require('fast-xml-parser');
+const parser = new XMLParser();
 
 /**
  * しょぼいカレンダーAPIにアクセスするルーティングを実装する
@@ -19,12 +19,18 @@ exports.getAnyDay = (router, animeModel) => {
       start: req.query.start,
       end: req.query.end
     }
-    request.get({
-      url: accessURL,
-      qs: options
+    const query = new URLSearchParams();
+    for(const key of Object.keys(options)){
+      if(options[key] !== undefined && options[key] !== null){
+        query.set(key, options[key]);
+      }
+    }
+    fetch(accessURL + "?" + query.toString())
+    .then((response)=>{
+      return response.json();
     })
     .then((response)=>{
-      animeList = JSON.parse(response);
+      animeList = response;
       // アニメのTID_LISTを取得
       let tidlist = [];
       for(let i=0; i<animeList['items'].length; i++){
@@ -116,6 +122,13 @@ exports.getAnyDay = (router, animeModel) => {
       // TODO: animeStory のサブタイトルの更新があったらUpdate
       res.header('Content-Type', 'application/json');
       res.send(animeList);
+    })
+    .catch((e)=>{
+      // 取得やパースに失敗してもサーバーを落とさず、エラーを返す
+      console.error(e);
+      res.header('Content-Type', 'application/json');
+      res.status(500);
+      res.send({status: 'ng', comment: 'しょぼいカレンダーからの取得に失敗しました'});
     });
   });
 }
@@ -154,9 +167,7 @@ exports.getNoRegistStories = async (router, animeModel) => {
         regStories: []
       };
 
-      const stories = await request.get({
-        url: url
-      })
+      const stories = await (await fetch(url)).text();
       const json = parser.parse(stories);
       if(!json.TitleLookupResponse || !json.TitleLookupResponse.TitleItems) {
         console.log(json);

@@ -13,7 +13,7 @@ services:
     command: [sh, -c, npm install && npm start]
 
   mariadb:
-    image: mariadb:latest
+    image: mariadb:10.5
     volumes:
       - ./sql:/docker-entrypoint-initdb.d
     restart: always
