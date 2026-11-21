@@ -1,1 +1,22 @@
-{"author":"hirarira617","dependencies":{"body-parser":"^1.20.3","cors":"^2.8.5","dotenv":"^16.4.5","express":"^4.21.2","fast-xml-parser":"^4.5.0","moment":"^2.30.1","mysql2":"^3.11.0","sequelize":"^6.37.8"},"description":"","license":"ISC","main":"server.js","name":"show_minogashi_anime","scripts":{"start":"node index.js","test":"echo \"Error: no test specified\" && exit 1"},"version":"0.2.0"}
+{
+  "name": "show_minogashi_anime",
+  "version": "0.2.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "fast-xml-parser": "^4.5.0",
+    "moment": "^2.30.1",
+    "mysql2": "^3.11.0",
+    "sequelize": "^6.37.8"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "hirarira617",
+  "license": "ISC"
+}
