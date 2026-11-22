@@ -34,7 +34,7 @@ router.use(function timeLog (req, res, next) {
 getShoboiAPI.getAnyDay(router, animeModel);
 
 // 未登録のアニメのサブタイを取得して登録
-// GET /getNoRegistStories/:tid
+// POST /getNoRegistStories/:tid
 getShoboiAPI.getNoRegistStories(router, animeModel);
 
 // 全ての見逃しアニメ情報を取得

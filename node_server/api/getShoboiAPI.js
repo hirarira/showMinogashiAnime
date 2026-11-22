@@ -145,7 +145,7 @@ class AnimeRegistError extends Error {
 
 // 未登録のアニメのサブタイを取得して登録
 exports.getNoRegistStories = async (router, animeModel) => {
-  router.get("/getNoRegistStories/:tid", async (req, res)=>{
+  router.post("/getNoRegistStories/:tid", async (req, res)=>{
     try {
       const base_url = "http://cal.syoboi.jp/db.php?Command=TitleLookup&TID=";
       const tid = req.params.tid;
