@@ -1,10 +1,11 @@
 "use strict";
 const moment = require('moment');
 const lib = require('./lib');
+const cors = require('cors');
 
 // アニメの全話数情報を取得
 exports.getAnyDay = (router, animeModel) => {
-  router.get("/getAnimeStoryList/:tid", (req, res)=>{
+  router.get("/getAnimeStoryList/:tid", cors(), (req, res)=>{
     let animePromises = [];
     animePromises.push( animeModel.about.getAnime(req.params.tid) );
     animePromises.push( animeModel.story.getAllAnimeStory(req.params.tid) );

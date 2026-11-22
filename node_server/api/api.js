@@ -44,6 +44,17 @@ router.get("/authTest", require('cors')(), auth.requireGoogleAuth, (req, res)=>{
   });
 });
 
+// 書き込み系エンドポイントの認証（二段構え：Google Bearer / nginx Basic の印）
+// CORS プリフライト（OPTIONS）は認証情報を持たないため、cors() を先に置いて通す
+const writePaths = [
+  '/getShoboiAnimeAnyDay',
+  '/getNoRegistStories',
+  '/setAnimeStory',
+  '/setAnimeReview',
+  '/setAnimeAbout'
+];
+router.use(writePaths, require('cors')(), auth.requireWriteAuth);
+
 // しょぼいカレンダーより任意の日付の見るアニメを取得
 // POST /getShoboiAnimeAnyDay/
 getShoboiAPI.getAnyDay(router, animeModel);
