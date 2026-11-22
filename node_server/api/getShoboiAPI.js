@@ -12,12 +12,14 @@ exports.getAnyDay = (router, animeModel) => {
     const shoboiHost = "http://cal.syoboi.jp/";
     const accessURL = shoboiHost + "rss2.php";
     let animeList;
+    // パラメータは JSON ボディで受け取る（互換のためクエリでも可、ボディ優先）
+    const params = Object.assign({}, req.query, req.body);
     let options = {
-      filter: req.query.filter,
-      alt: req.query.alt,
+      filter: params.filter,
+      alt: params.alt,
       usr: username,
-      start: req.query.start,
-      end: req.query.end
+      start: params.start,
+      end: params.end
     }
     const query = new URLSearchParams();
     for(const key of Object.keys(options)){
