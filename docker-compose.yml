@@ -3,6 +3,11 @@ version: '3.1'
 services:
   node:
     build: ./dockerfiles/
+    environment:
+      ANIME_DB_USER_NAME: ${ANIME_DB_USER_NAME}
+      ANIME_DB_PASS: ${ANIME_DB_PASS}
+      ANIME_DB_HOST: ${ANIME_DB_HOST:-mariadb}
+      ANIME_SHOBOI_CALENDAR_USERNAME: ${ANIME_SHOBOI_CALENDAR_USERNAME}
     volumes:
       - ./node_server:/server
     ports:
@@ -19,6 +24,6 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: anime
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: mariadb
-      MYSQL_ROOT_PASSWORD: mariadb
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
