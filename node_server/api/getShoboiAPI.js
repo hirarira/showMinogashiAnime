@@ -8,16 +8,18 @@ const parser = new XMLParser();
  */
  // しょぼいカレンダーより任意の日付の見るアニメを取得
 exports.getAnyDay = (router, animeModel) => {
-  router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
+  router.post("/getShoboiAnimeAnyDay/", (req, res)=>{
     const shoboiHost = "http://cal.syoboi.jp/";
     const accessURL = shoboiHost + "rss2.php";
     let animeList;
+    // パラメータは JSON ボディで受け取る（互換のためクエリでも可、ボディ優先）
+    const params = Object.assign({}, req.query, req.body);
     let options = {
-      filter: req.query.filter,
-      alt: req.query.alt,
+      filter: params.filter,
+      alt: params.alt,
       usr: username,
-      start: req.query.start,
-      end: req.query.end
+      start: params.start,
+      end: params.end
     }
     const query = new URLSearchParams();
     for(const key of Object.keys(options)){
@@ -143,7 +145,7 @@ class AnimeRegistError extends Error {
 
 // 未登録のアニメのサブタイを取得して登録
 exports.getNoRegistStories = async (router, animeModel) => {
-  router.get("/getNoRegistStories/:tid", async (req, res)=>{
+  router.post("/getNoRegistStories/:tid", async (req, res)=>{
     try {
       const base_url = "http://cal.syoboi.jp/db.php?Command=TitleLookup&TID=";
       const tid = req.params.tid;

@@ -30,11 +30,11 @@ router.use(function timeLog (req, res, next) {
 });
 
 // しょぼいカレンダーより任意の日付の見るアニメを取得
-// GET /getShoboiAnimeAnyDay/
+// POST /getShoboiAnimeAnyDay/
 getShoboiAPI.getAnyDay(router, animeModel);
 
 // 未登録のアニメのサブタイを取得して登録
-// GET /getNoRegistStories/:tid
+// POST /getNoRegistStories/:tid
 getShoboiAPI.getNoRegistStories(router, animeModel);
 
 // 全ての見逃しアニメ情報を取得

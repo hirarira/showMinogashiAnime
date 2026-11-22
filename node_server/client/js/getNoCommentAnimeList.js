@@ -45,12 +45,17 @@
   // UPSFlag
   let in_url = "./api/getShoboiAnimeAnyDay";
   console.log(in_url);
-  $.get(in_url,{
-    filter: 1,
-    alt: "json",
-    start: startDateFormat,
-    end: endDateFormat
-  },(importAnimeSet)=>{
+  $.ajax({
+    url: in_url,
+    type: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({
+      filter: 1,
+      alt: "json",
+      start: startDateFormat,
+      end: endDateFormat
+    }),
+    success: (importAnimeSet)=>{
     let AnimeDataSet = [];
     let count = 0;
     for(let i=0;i<importAnimeSet.items.length;i++){
@@ -60,6 +65,7 @@
         nowPushAnime["id"] = count++;
         minogashiAnimeList.push( nowPushAnime );
       }
+    }
     }
   });
 })();
