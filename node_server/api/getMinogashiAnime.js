@@ -1,6 +1,7 @@
 "use strict";
 const moment = require('moment');
 const lib = require('./lib');
+const cors = require('cors');
 
 /**
  * 見逃しアニメに関するルーティングを実装する
@@ -8,7 +9,7 @@ const lib = require('./lib');
 
 // 過去一週間の見逃しアニメ情報を取得
 exports.getWeek = (router, animeModel) => {
-  router.get("/getWeekMinogashiAnime", (req, res)=>{
+  router.get("/getWeekMinogashiAnime", cors(), (req, res)=>{
     let minogashiAnimeListData;
     const lastWeek = moment().subtract(7, 'days').startOf('day');
     animeModel.story.getWeekMinogashiAnime(lastWeek)
