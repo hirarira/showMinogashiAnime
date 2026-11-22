@@ -51,3 +51,18 @@ exports.requireGoogleAuth = async (req, res, next) => {
 };
 
 exports.verifyGoogleIdToken = verifyGoogleIdToken;
+
+// 書き込み系エンドポイント用の二段構え認証（SMA フロント層の移行期間用）。
+// 以下のどちらかを満たせば通す：
+//  1. Authorization: Bearer <Google ID トークン>（Animel から）
+//  2. X-Sma-Auth-Marker: basic（nginx の Basic 認証を通過した従来の管理ページから）
+// 印ヘッダーは nginx が Basic 認証成功時にだけ付け、proxy_set_header で必ず上書きされる。
+// API ポート（8000）は外部公開されていないため、外部のクライアントが印を偽造することはできない。
+// SMA のフロント層を破棄したら、この二段構えは Bearer のみに一本化する。
+exports.requireWriteAuth = (req, res, next) => {
+  if (req.headers['x-sma-auth-marker'] === 'basic') {
+    req.authMethod = 'basic';
+    return next();
+  }
+  return exports.requireGoogleAuth(req, res, next);
+};
