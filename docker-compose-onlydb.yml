@@ -9,9 +9,9 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: anime
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: mariadb
-      MYSQL_ROOT_PASSWORD: mariadb
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - "3306:3306"
   phpmyadmin:
@@ -21,7 +21,7 @@ services:
     environment:
       - PMA_ARBITRARY=1
       - PMA_HOSTS=mariadb
-      - PMA_USER=admin
-      - PMA_PASSWORD=mariadb
+      - PMA_USER=${MYSQL_USER}
+      - PMA_PASSWORD=${MYSQL_PASSWORD}
     ports:
       - "3001:80"

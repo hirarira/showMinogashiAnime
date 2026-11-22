@@ -1,6 +1,6 @@
 #!/bin/bash
-export ANIME_DB_USER_NAME=root
-export ANIME_DB_PASS=mariadb
-export ANIME_DB_HOST=localhost
-export ANIME_SHOBOI_CALENDAR_USERNAME=hirarira617
+# 環境変数は .env（リポジトリ管理外）から読み込む
+set -a
+source ./.env
+set +a
 node index.js
