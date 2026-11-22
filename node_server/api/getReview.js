@@ -104,6 +104,50 @@ exports.getRoundRate = (router, animeModel) => {
   });
 }
 
+// タイトル部分一致でアニメを検索する（概要+レビューのマージ形式で返す）
+exports.search = (router, animeModel) => {
+  router.get("/searchAnime/:query", cors(), async (req, res)=>{
+    res.header('Content-Type', 'application/json');
+    const query = (req.params.query || '').trim();
+    // 公開エンドポイントなので、短すぎるクエリでの大量取得を防ぐ
+    if(query.length < 2) {
+      res.send({
+        status: 'ng',
+        body: '検索クエリは2文字以上で指定してください'
+      });
+      return;
+    }
+    let limit = parseInt(req.query.limit, 10);
+    if(Number.isNaN(limit) || limit < 1) {
+      limit = 50;
+    }
+    if(limit > 200) {
+      limit = 200;
+    }
+    try {
+      // LIKE のワイルドカード（% _ \）はリテラルとして扱う
+      const escapedQuery = query.replace(/[\\%_]/g, '\\$&');
+      const animeAboutList = await animeModel.about.searchAnimeByTitle(escapedQuery, limit);
+      const tidList = animeAboutList.map((anime)=>{
+        return anime.tid
+      });
+      const reviewList = tidList.length ? await animeModel.review.getAnimeReviews(tidList) : [];
+      const animeList = mergeAnimeInfo(animeAboutList, reviewList);
+      res.send({
+        status: 'ok',
+        body: animeList
+      });
+    }
+    catch(e) {
+      console.error(e);
+      res.send({
+        status: 'ng',
+        body: '検索に失敗しました'
+      });
+    }
+  });
+}
+
 // 全件のレビューを返す
 exports.getAll = (router, animeModel) => {
   router.get("/getAllAnimeReview", cors(), async (req, res)=>{

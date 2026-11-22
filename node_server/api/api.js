@@ -57,6 +57,10 @@ getReview.getWatchDate(router, animeModel);
 // GET /getRoundRate
 getReview.getRoundRate(router, animeModel);
 
+// タイトル部分一致でアニメを検索する
+// GET /searchAnime/:query
+getReview.search(router, animeModel);
+
 // 全件のレビューを返す
 // GET /getAllAnimeReview
 getReview.getAll(router, animeModel);

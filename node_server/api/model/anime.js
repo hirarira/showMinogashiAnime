@@ -37,6 +37,18 @@ module.exports = class{
   getAllAnime(){
     return this.model.findAll();
   }
+  searchAnimeByTitle(query, limit){
+    const Sequelize = require('sequelize');
+    return this.model.findAll({
+      where: {
+        title: {
+          [Sequelize.Op.like]: `%${query}%`
+        }
+      },
+      order: [['tid', 'DESC']],
+      limit: limit
+    });
+  }
   insertAnimeAbout(options){
     return this.model.create({
       tid: options.tid,
