@@ -14,6 +14,7 @@ const animeModel = {
   story: new AnimeStory(sequelize)
 }
 
+const auth = require('./auth');
 const getMinogashi = require('./getMinogashiAnime');
 const getShoboiAPI = require('./getShoboiAPI');
 const getReview = require('./getReview');
@@ -27,6 +28,20 @@ if(animeModel.review == null){
 router.use(function timeLog (req, res, next) {
   console.log('Time: ', Date.now());
   next();
+});
+
+// 認証テスト用エンドポイント（Google ID トークン必須）
+// GET /authTest
+router.get("/authTest", require('cors')(), auth.requireGoogleAuth, (req, res)=>{
+  res.header('Content-Type', 'application/json');
+  res.send({
+    status: 'ok',
+    body: {
+      email: req.googleUser.email,
+      sub: req.googleUser.sub,
+      name: req.googleUser.name
+    }
+  });
 });
 
 // しょぼいカレンダーより任意の日付の見るアニメを取得
