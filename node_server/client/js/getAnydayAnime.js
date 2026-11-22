@@ -20,12 +20,12 @@
   function getAjaxShoboiAnimedata(startDateFormat, endDateFormat, callback){
     // UPSFlag
     let in_url = "./api/getShoboiAnimeAnyDay";
-    $.get(in_url, {
+    $.post(in_url + "?" + $.param({
       filter: 1,
       alt: "json",
       start: startDateFormat,
       end: endDateFormat
-    },(importAnimeSet)=>{
+    }),(importAnimeSet)=>{
       console.log(importAnimeSet);
       callback();
     });

@@ -45,12 +45,12 @@
   // UPSFlag
   let in_url = "./api/getShoboiAnimeAnyDay";
   console.log(in_url);
-  $.get(in_url,{
+  $.post(in_url + "?" + $.param({
     filter: 1,
     alt: "json",
     start: startDateFormat,
     end: endDateFormat
-  },(importAnimeSet)=>{
+  }),(importAnimeSet)=>{
     let AnimeDataSet = [];
     let count = 0;
     for(let i=0;i<importAnimeSet.items.length;i++){

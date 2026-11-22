@@ -8,7 +8,7 @@ const parser = new XMLParser();
  */
  // しょぼいカレンダーより任意の日付の見るアニメを取得
 exports.getAnyDay = (router, animeModel) => {
-  router.get("/getShoboiAnimeAnyDay/", (req, res)=>{
+  router.post("/getShoboiAnimeAnyDay/", (req, res)=>{
     const shoboiHost = "http://cal.syoboi.jp/";
     const accessURL = shoboiHost + "rss2.php";
     let animeList;
