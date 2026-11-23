@@ -26,7 +26,7 @@ function mergeAnimeInfo(animeAboutList, reviewList) {
 
 // レビューを1件返す
 exports.getOne = (router, animeModel) => {
-  router.get("/getAnimeReview/:tid", (req, res)=>{
+  router.get("/getAnimeReview/:tid", cors(), (req, res)=>{
     res.header('Content-Type', 'application/json');
     let animePromises = [];
     animePromises.push( animeModel.review.getAnimeReview(req.params.tid) );
