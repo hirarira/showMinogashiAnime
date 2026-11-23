@@ -49,6 +49,8 @@ router.get("/authTest", require('cors')(), auth.requireGoogleAuth, (req, res)=>{
 
 // セッショントークンの発行（Google ID トークンのみ。セッショントークンや印ヘッダーでは発行しない）
 // POST /session
+// CORS プリフライト（OPTIONS）は認証情報を持たないため、書き込み系と同じく use() で cors() を先に通す
+router.use('/session', require('cors')());
 router.post("/session", require('cors')(), auth.requireGoogleAuth, (req, res)=>{
   res.header('Content-Type', 'application/json');
   try {
