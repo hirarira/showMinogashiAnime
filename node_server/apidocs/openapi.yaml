@@ -10,7 +10,7 @@ info:
     * 書き込み系は認証必須です。Google ID トークン（Bearer、Animel から）か、nginx の Basic 認証を通過した旧 SMA 画面からのリクエストのいずれかで認証します。
     * 一覧・検索系（getAllAnimeReview / getWatchDate / getRoundRate / searchAnime）は、視聴済（status=watched）の作品だけを返します。
     * サムネイル画像は DB に入れずサーバー上のファイルとして保持し、DB にはファイル名だけを持ちます。
-  version: 1.1.0
+  version: 1.2.0
 servers:
   - url: https://pollux.hirarira.net/showMinogashiAnime/api
     description: 本番
@@ -124,6 +124,38 @@ paths:
                   body:
                     type: string
                     example: unauthorized
+  /session:
+    post:
+      tags: [認証]
+      summary: セッショントークンの発行（Google ID トークン必須）
+      description: Google ID トークンを検証し、有効期間30日のセッショントークン（サーバー発行・HMAC署名）を返します。Animel はサインイン直後にこれを取得して保存し、以降の書き込みにはセッショントークンを使います。セッショントークン自体や Basic 認証の印では発行できません（必ず Google ID トークンが必要です）。
+      security:
+        - googleBearer: []
+      responses:
+        '200':
+          description: OK（発行成功）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  body:
+                    type: object
+                    properties:
+                      sessionToken:
+                        type: string
+                      email:
+                        type: string
+                      expiresAt:
+                        type: integer
+                        description: 有効期限（Unix ミリ秒）
+        '401':
+          description: 認証失敗（トークンなし・不正・アカウント不一致・未設定）
+        '500':
+          description: セッション未設定（ANIME_SESSION_SECRET が未設定）
   /getAnimeReview/{tid}:
     get:
       tags: [レビュー]
@@ -698,7 +730,7 @@ components:
     googleBearer:
       type: http
       scheme: bearer
-      description: Google ID トークン（Animel の Google サインインで取得）
+      description: Google ID トークン（Animel の Google サインインで取得）。書き込み系エンドポイントでは、POST /session で発行したセッショントークン（有効期間30日）も同じ Bearer として使えます
     basicAuth:
       type: http
       scheme: basic
