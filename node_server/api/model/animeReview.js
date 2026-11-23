@@ -13,7 +13,11 @@ module.exports = class{
       airtime: this.Sequelize.INTEGER,
       comment: this.Sequelize.TEXT,
       original: this.Sequelize.TEXT,
-      genre: this.Sequelize.TEXT
+      genre: this.Sequelize.TEXT,
+      status: {
+        type: this.Sequelize.STRING(16),
+        defaultValue: 'watched'
+      }
     }, {
       // モデル名をそのままテーブル名として使う
       freezeTableName: true,
@@ -71,6 +75,12 @@ module.exports = class{
       where: {
         tid: options.tid
       }
+    });
+  }
+  updateStatus(options){
+    return this.model.upsert({
+      tid: options.tid,
+      status: options.status
     });
   }
 }
