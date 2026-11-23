@@ -1,0 +1,886 @@
+openapi: 3.0.3
+info:
+  title: Animel バックエンド API（showMinogashiAnime）
+  description: |
+    見逃しアニメ管理アプリ showMinogashiAnime（Animel のバックエンド）の API ドキュメント。
+
+    * レスポンスは原則 `{ "status": "ok", "body": ... }` の形式で返ります。
+    * `tid` はしょぼいカレンダーのタイトル ID です。
+    * このドキュメントページ自体は Basic 認証で保護されていますが、API 本体の読み取りは Animel（フロントエンド）から使うため公開されています。
+    * 書き込み系は認証必須です。Google ID トークン（Bearer、Animel から）か、nginx の Basic 認証を通過した旧 SMA 画面からのリクエストのいずれかで認証します。
+    * 一覧・検索系（getAllAnimeReview / getWatchDate / getRoundRate / searchAnime）は、視聴済（status=watched）の作品だけを返します。
+    * サムネイル画像は DB に入れずサーバー上のファイルとして保持し、DB にはファイル名だけを持ちます。
+  version: 1.1.0
+servers:
+  - url: https://pollux.hirarira.net/showMinogashiAnime/api
+    description: 本番
+tags:
+  - name: レビュー
+    description: アニメレビューの取得・登録
+  - name: 話数・見逃し
+    description: 各話情報と見逃しチェック
+  - name: 作品情報
+    description: 作品概要の取得・登録
+  - name: しょぼいカレンダー連携
+    description: しょぼいカレンダーからの取得・話数登録
+  - name: 認証
+    description: 認証基盤の確認用
+  - name: サムネイル
+    description: サムネイル画像の登録・配信
+paths:
+  /getAllAnimeReview:
+    get:
+      tags: [レビュー]
+      summary: 全件のレビューを取得
+      description: レビューに作品情報（タイトル等）を結合した一覧を返します。Animel の一覧表示で使用。視聴済（status=watched）の作品のみ返します。
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  body:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AnimeReview'
+  /searchAnime/{query}:
+    get:
+      tags: [レビュー]
+      summary: タイトル部分一致でアニメを検索
+      description: タイトルに検索文字列を含むアニメを、レビューと結合した形式（getAllAnimeReview と同じ）で新しい順に返します。視聴済（status=watched）の作品のみが対象です。クエリは2文字以上必須。件数はデフォルト50件、最大200件です。クエリ内の % _ \ はリテラルとして扱います。
+      parameters:
+        - name: query
+          in: path
+          required: true
+          description: 検索文字列（タイトル部分一致、2文字以上）
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: 取得件数の上限
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
+      responses:
+        '200':
+          description: OK（クエリが2文字未満の場合は status が ng になります）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  body:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AnimeReview'
+  /authTest:
+    get:
+      tags: [認証]
+      summary: 認証テスト（Google ID トークン必須）
+      description: Stage 2 の認証基盤を試す仮エンドポイント。Authorization ヘッダーの Google ID トークンをサーバー側で検証し、許可アカウント（環境変数で指定）の場合のみ本人情報（email / sub / name）を返します。それ以外は 401 です。クライアント ID 未設定時は全リクエストが 401 になります。
+      security:
+        - googleBearer: []
+      responses:
+        '200':
+          description: OK（認証成功）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  body:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                        example: user@example.com
+                      sub:
+                        type: string
+                      name:
+                        type: string
+        '401':
+          description: 認証失敗（トークンなし・不正・アカウント不一致・未設定）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ng
+                  body:
+                    type: string
+                    example: unauthorized
+  /getAnimeReview/{tid}:
+    get:
+      tags: [レビュー]
+      summary: レビューを1件取得
+      parameters:
+        - $ref: '#/components/parameters/Tid'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  body:
+                    $ref: '#/components/schemas/AnimeReview'
+  /getWatchDate/{watchDate}:
+    get:
+      tags: [レビュー]
+      summary: 視聴日に一致するレビューを取得
+      description: watchDate に対して部分一致（LIKE）で検索します。視聴済（status=watched）の作品のみ返します。`2025` や `2025/11` のような指定ができます。
+      parameters:
+        - name: watchDate
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '2025/11'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  body:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AnimeReview'
+  /getRoundRate/{highLimit}/{lowLimit}:
+    get:
+      tags: [レビュー]
+      summary: 評価（rate）の範囲でレビューを取得
+      description: パスの順番は「上限／下限」です（内部では lowLimit〜highLimit の BETWEEN 検索）。視聴済（status=watched）の作品のみ返します。
+      parameters:
+        - name: highLimit
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 90
+        - name: lowLimit
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 80
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  body:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AnimeReview'
+  /setAnimeReview:
+    post:
+      tags: [レビュー]
+      summary: レビューを登録・更新
+      security:
+        - googleBearer: []
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tid:
+                  type: integer
+                  example: 7828
+                rate:
+                  type: integer
+                  description: 評価（0〜100。90=神作, 80=秀作, 75=名作, 70=佳作, 60=良作, 55=準良作, 50=凡作, 40=微妙作, 30=駄作, 1=問題作, 0=未評価。旧来の負数による特殊評価は廃止され、視聴ステータスで表現します）
+                  example: 80
+                comment:
+                  type: string
+                  example: 面白かった
+                watchDate:
+                  type: string
+                  description: 視聴日（yyyy/mm/dd）
+                  example: '2026/11/21'
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                tid:
+                  type: integer
+                rate:
+                  type: integer
+                comment:
+                  type: string
+                watchDate:
+                  type: string
+      responses:
+        '200':
+          description: OK（失敗時も 200 で status が ng になります）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResult'
+  /getAnimeStoryList/{tid}:
+    get:
+      tags: [話数・見逃し]
+      summary: 作品概要と全話数情報を取得
+      parameters:
+        - $ref: '#/components/parameters/Tid'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  body:
+                    type: object
+                    properties:
+                      about:
+                        $ref: '#/components/schemas/AnimeAbout'
+                      story:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AnimeStory'
+  /getAnimeAnyDay/{start}/{end}:
+    get:
+      tags: [話数・見逃し]
+      summary: 任意の時間範囲の放送情報を取得（DB のみ）
+      description: |
+        start〜end の間に放送開始する話数を、作品情報と結合して返します。
+        note テンプレート生成などで使用。時刻は Unix 時間（ミリ秒）です。
+      parameters:
+        - name: start
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: 開始時刻（Unix ミリ秒）
+        - name: end
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: 終了時刻（Unix ミリ秒）
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  body:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StoryWithAbout'
+  /getNowAnime/{limit}:
+    get:
+      tags: [話数・見逃し]
+      summary: まもなく放送の情報を取得
+      description: 現在時刻から limit 分後までに放送開始する話数を返します。
+      parameters:
+        - name: limit
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 何分先まで取得するか
+          example: 60
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  body:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StoryWithAbout'
+  /getWeekMinogashiAnime:
+    get:
+      tags: [話数・見逃し]
+      summary: 過去1週間の見逃し一覧を取得
+      description: 放送済みで見逃しフラグが未チェック（minogashi=0）の話数を、作品情報と結合して返します。
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  body:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StoryWithAbout'
+  /getAllMinogashiAnime:
+    get:
+      tags: [話数・見逃し]
+      summary: 全期間の見逃し一覧を取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  body:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StoryWithAbout'
+  /setAnimeStory:
+    post:
+      tags: [話数・見逃し]
+      summary: 話数情報を更新（見逃しフラグ・コメント）
+      security:
+        - googleBearer: []
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tid:
+                  type: integer
+                  example: 7828
+                count:
+                  type: integer
+                  description: 話数
+                  example: 1
+                minogashi:
+                  type: integer
+                  description: 見逃しチェック（0=未視聴/見逃し, 1=視聴済み）
+                  example: 1
+                comment:
+                  type: string
+                  example: あとで見る
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                tid:
+                  type: integer
+                count:
+                  type: integer
+                minogashi:
+                  type: integer
+                comment:
+                  type: string
+      responses:
+        '200':
+          description: OK（失敗時も 200 で status が ng になります）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResult'
+  /setAnimeAbout:
+    post:
+      tags: [作品情報]
+      summary: 作品概要を登録・更新
+      security:
+        - googleBearer: []
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tid:
+                  type: integer
+                  example: 7828
+                hashTag:
+                  type: string
+                  example: '#こめかみっ'
+                characterURL:
+                  type: string
+                publicURL:
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                tid:
+                  type: integer
+                hashTag:
+                  type: string
+                characterURL:
+                  type: string
+                publicURL:
+                  type: string
+      responses:
+        '200':
+          description: OK（失敗時も 200 で status が ng になります）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResult'
+  /getShoboiAnimeAnyDay:
+    post:
+      tags: [しょぼいカレンダー連携]
+      summary: しょぼいカレンダーから任意期間の放送情報を取得
+      security:
+        - googleBearer: []
+        - basicAuth: []
+      description: |
+        しょぼいカレンダーの rss2.php の結果をそのまま返し、各 item に DB の見逃し状態（minogashi）を付与します。
+        未登録の話数があれば DB へ登録も行います（書き込みを伴うため POST。Basic 認証必須）。パラメータは JSON ボディで渡し、start/end は `yyyyMMddHHmm` 形式です。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [start, end]
+              properties:
+                start:
+                  type: string
+                  description: 取得開始日時（yyyyMMddHHmm 形式）
+                  example: '202611210500'
+                end:
+                  type: string
+                  description: 取得終了日時（yyyyMMddHHmm 形式）
+                  example: '202611220500'
+                filter:
+                  type: integer
+                  description: しょぼいカレンダーのフィルタ指定（クライアントは 1 を送信）
+                  example: 1
+                alt:
+                  type: string
+                  description: 出力形式（json 固定で使用）
+                  example: json
+      responses:
+        '200':
+          description: OK（しょぼいカレンダーの JSON をそのまま返却）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ShoboiItem'
+        '500':
+          description: しょぼいカレンダーからの取得に失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ng
+                  comment:
+                    type: string
+                    example: しょぼいカレンダーからの取得に失敗しました
+  /getNoRegistStories/{tid}:
+    post:
+      tags: [しょぼいカレンダー連携]
+      summary: 未登録の話数をしょぼいカレンダーから取得して登録
+      security:
+        - googleBearer: []
+        - basicAuth: []
+      description: 作品概要が未登録の場合は概要も登録します。登録するものが無い場合は、その旨の comment とともに 200 を返します。
+      parameters:
+        - $ref: '#/components/parameters/Tid'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  comment:
+                    type: string
+                    example: All registered successfully
+                  regStories:
+                    type: array
+                    items:
+                      type: object
+                  date:
+                    type: string
+                    format: date-time
+  /getAnimeByStatus/{status}:
+    get:
+      tags: [レビュー]
+      summary: 視聴ステータス別のアニメ一覧を取得
+      description: 指定した視聴ステータスのアニメを、レビューと結合した形式（getAllAnimeReview と同じ）で返します。管理画面のステータス別一覧で使用。status が不正な場合は status が ng になります。
+      parameters:
+        - name: status
+          in: path
+          required: true
+          description: 視聴ステータス
+          schema:
+            type: string
+            enum: [unwatched, watching, watched, stalled, dropped]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  body:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AnimeReview'
+  /setAnimeStatus:
+    post:
+      tags: [レビュー]
+      summary: 視聴ステータスを登録・更新
+      security:
+        - googleBearer: []
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tid:
+                  type: integer
+                  example: 7828
+                status:
+                  type: string
+                  enum: [unwatched, watching, watched, stalled, dropped]
+                  description: 視聴ステータス（未視聴／視聴中／視聴済／詰み／視聴断念）
+                  example: watched
+      responses:
+        '200':
+          description: OK（失敗時も 200 で status が ng になります）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResult'
+  /setAnimeThumbnail:
+    post:
+      tags: [サムネイル]
+      summary: サムネイル画像を登録・差し替え
+      description: 画像を base64 で受け取り、サーバー上の thumbnails/{tid}.{ext} に保存します（DB にはファイル名だけを保持）。形式はマジックバイトで判定（jpg/png/webp/gif）、上限 4MB。拡張子の違う旧ファイルは削除されます。
+      security:
+        - googleBearer: []
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tid:
+                  type: integer
+                  example: 7828
+                dataBase64:
+                  type: string
+                  description: '画像データ（base64、data: プレフィックスなし）'
+      responses:
+        '200':
+          description: OK（失敗時も 200 で status が ng になります）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResult'
+  /deleteAnimeThumbnail:
+    post:
+      tags: [サムネイル]
+      summary: サムネイル画像を削除
+      description: サムネイルの実ファイルを削除し、DB の記録を空に戻します。
+      security:
+        - googleBearer: []
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tid:
+                  type: integer
+                  example: 7828
+      responses:
+        '200':
+          description: OK（失敗時も 200 で status が ng になります）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResult'
+  /thumbnails/{fileName}:
+    get:
+      tags: [サムネイル]
+      summary: サムネイル画像を取得
+      description: 登録済みサムネイルの実ファイルを返します（静的配信）。レビュー系 API の thumbnail フィールドがこの URL を指します。
+      parameters:
+        - name: fileName
+          in: path
+          required: true
+          description: ファイル名（{tid}.{ext}）
+          schema:
+            type: string
+          example: 7828.jpg
+      responses:
+        '200':
+          description: OK
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: 未登録
+components:
+  securitySchemes:
+    googleBearer:
+      type: http
+      scheme: bearer
+      description: Google ID トークン（Animel の Google サインインで取得）
+    basicAuth:
+      type: http
+      scheme: basic
+      description: 旧 SMA 画面用。nginx の Basic 認証を通過したリクエストは、アプリ側ではマーカーで識別されます（Animel からは googleBearer を使用）
+  parameters:
+    Tid:
+      name: tid
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: しょぼいカレンダーのタイトル ID
+      example: 7828
+  schemas:
+    AnimeAbout:
+      type: object
+      properties:
+        tid:
+          type: integer
+          example: 7828
+        title:
+          type: string
+          example: こめかみっ！Girls
+        chName:
+          type: string
+          description: 放送局名
+        url:
+          type: string
+          description: 公式サイト等の URL
+        hashTag:
+          type: string
+        characterURL:
+          type: string
+        publicURL:
+          type: string
+        thumbnail:
+          type: string
+          nullable: true
+          description: サムネイルのファイル名（実ファイルはサーバー上に保持。配信URLはレビュー結合形の thumbnail を参照）
+    AnimeStory:
+      type: object
+      properties:
+        id:
+          type: integer
+        tid:
+          type: integer
+        count:
+          type: integer
+          description: 話数
+        stTime:
+          type: integer
+          description: 放送開始時刻（Unix 秒）
+        edTime:
+          type: integer
+          description: 放送終了時刻（Unix 秒）
+        lastUpdate:
+          type: integer
+        subTitle:
+          type: string
+          description: サブタイトル
+        minogashi:
+          type: integer
+          description: 見逃しチェック（0=未視聴/見逃し, 1=視聴済み）
+        comment:
+          type: string
+          nullable: true
+    AnimeReview:
+      type: object
+      description: レビューに作品情報を結合したもの
+      properties:
+        tid:
+          type: integer
+        watchDate:
+          type: string
+          description: 視聴日（yyyy/mm/dd）
+          example: '2026/11/21'
+        rate:
+          type: integer
+          description: 評価（0〜100、0=未評価）
+          example: 80
+        airtime:
+          type: integer
+          nullable: true
+          description: 放送時間帯コード
+        comment:
+          type: string
+          nullable: true
+        original:
+          type: string
+          nullable: true
+          description: 原作
+        genre:
+          type: string
+          nullable: true
+        title:
+          type: string
+        chName:
+          type: string
+        url:
+          type: string
+        hashTag:
+          type: string
+        characterURL:
+          type: string
+        publicURL:
+          type: string
+        status:
+          type: string
+          enum: [unwatched, watching, watched, stalled, dropped]
+          description: 視聴ステータス（未視聴／視聴中／視聴済／詰み／視聴断念）
+          example: watched
+        thumbnail:
+          type: string
+          nullable: true
+          description: サムネイル画像の配信URL（未登録なら null）
+    StoryWithAbout:
+      type: object
+      description: 話数情報に作品情報を結合したもの（getAnimeAnyDay 系では limitSecond も付与）
+      properties:
+        id:
+          type: integer
+        tid:
+          type: integer
+        count:
+          type: integer
+        stTime:
+          type: integer
+        edTime:
+          type: integer
+        lastUpdate:
+          type: integer
+        subTitle:
+          type: string
+        minogashi:
+          type: integer
+        comment:
+          type: string
+          nullable: true
+        title:
+          type: string
+        chName:
+          type: string
+        url:
+          type: string
+        hashTag:
+          type: string
+        characterURL:
+          type: string
+        publicURL:
+          type: string
+        limitSecond:
+          type: integer
+          description: 放送開始までの秒数（getAnimeAnyDay / getNowAnime のみ）
+    ShoboiItem:
+      type: object
+      description: しょぼいカレンダー rss2.php の item（主なフィールドのみ）
+      properties:
+        TID:
+          type: integer
+        Title:
+          type: string
+        ChName:
+          type: string
+        ChID:
+          type: integer
+        StTime:
+          type: string
+        EdTime:
+          type: string
+        Count:
+          type: integer
+        SubTitle:
+          type: string
+        minogashi:
+          type: boolean
+          description: DB 上の見逃し状態（この API が付与）
+    PostResult:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        date:
+          type: string
+          format: date-time
