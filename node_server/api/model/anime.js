@@ -11,7 +11,7 @@ module.exports = class{
       title: Sequelize.TEXT,
       chName: Sequelize.STRING,
       url: Sequelize.TEXT,
-      hashTag: Sequelize.STRING,
+      hashTag: Sequelize.TEXT,
       characterURL: Sequelize.TEXT,
       publicURL: Sequelize.TEXT
     }, {
