@@ -47,6 +47,29 @@ router.get("/authTest", require('cors')(), auth.requireGoogleAuth, (req, res)=>{
   });
 });
 
+// セッショントークンの発行（Google ID トークンのみ。セッショントークンや印ヘッダーでは発行しない）
+// POST /session
+router.post("/session", require('cors')(), auth.requireGoogleAuth, (req, res)=>{
+  res.header('Content-Type', 'application/json');
+  try {
+    const session = auth.mintSessionToken(req.googleUser.email);
+    res.send({
+      status: 'ok',
+      body: {
+        sessionToken: session.token,
+        email: req.googleUser.email,
+        expiresAt: session.expiresAt
+      }
+    });
+  }
+  catch (e) {
+    res.status(500).send({
+      status: 'ng',
+      body: 'session is not available'
+    });
+  }
+});
+
 // 書き込み系エンドポイントの認証（二段構え：Google Bearer / nginx Basic の印）
 // CORS プリフライト（OPTIONS）は認証情報を持たないため、cors() を先に置いて通す
 const writePaths = [
