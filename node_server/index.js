@@ -26,6 +26,9 @@ app.use("/css", Express.static(__dirname  + '/client/css'));
 app.use("/js", Express.static(__dirname  + '/client/js'));
 app.use("/img", Express.static(__dirname  + '/client/img'));
 
+// APIドキュメント（Swagger UI）。仕様書はこのリポジトリで管理する
+app.use("/apidocs", Express.static(__dirname  + '/apidocs'));
+
 let api = require('./api/api.js');
 app.use('/api', api);
 
