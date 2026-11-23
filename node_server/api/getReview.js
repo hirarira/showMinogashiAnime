@@ -24,6 +24,14 @@ function mergeAnimeInfo(animeAboutList, reviewList) {
   }
 }
 
+// 公開側の一覧・検索では視聴済（watched）の作品だけを返す。
+// 個別取得（getAnimeReview）とステータス別取得（getAnimeByStatus）は管理画面でも使うため対象外。
+function onlyWatched(animeList) {
+  return animeList.filter((anime)=>{
+    return anime.status === 'watched';
+  });
+}
+
 // レビューを1件返す
 exports.getOne = (router, animeModel) => {
   router.get("/getAnimeReview/:tid", cors(), (req, res)=>{
@@ -74,7 +82,7 @@ exports.getWatchDate = (router, animeModel) => {
       return anime.tid
     });
     const animeAboutList = await animeModel.about.getAnimeList(tidList);
-    const animeList = mergeAnimeInfo(animeAboutList, reviewList);
+    const animeList = onlyWatched(mergeAnimeInfo(animeAboutList, reviewList));
     res.header('Content-Type', 'application/json');
     let res_body = {
       status: 'ok',
@@ -94,7 +102,7 @@ exports.getRoundRate = (router, animeModel) => {
       return anime.tid
     });
     const animeAboutList = await animeModel.about.getAnimeList(tidList);
-    const animeList = mergeAnimeInfo(animeAboutList, reviewList);
+    const animeList = onlyWatched(mergeAnimeInfo(animeAboutList, reviewList));
     res.header('Content-Type', 'application/json');
     let res_body = {
       status: 'ok',
@@ -132,7 +140,7 @@ exports.search = (router, animeModel) => {
         return anime.tid
       });
       const reviewList = tidList.length ? await animeModel.review.getAnimeReviews(tidList) : [];
-      const animeList = mergeAnimeInfo(animeAboutList, reviewList);
+      const animeList = onlyWatched(mergeAnimeInfo(animeAboutList, reviewList));
       res.send({
         status: 'ok',
         body: animeList
@@ -153,7 +161,7 @@ exports.getAll = (router, animeModel) => {
   router.get("/getAllAnimeReview", cors(), async (req, res)=>{
     const reviewList = await animeModel.review.getAllAnimeReview();
     const animeAboutList = await animeModel.about.getAllAnime();
-    const animeList = mergeAnimeInfo(animeAboutList, reviewList);
+    const animeList = onlyWatched(mergeAnimeInfo(animeAboutList, reviewList));
     res.header('Content-Type', 'application/json');
     let res_body = {
       status: 'ok',
