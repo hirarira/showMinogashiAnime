@@ -51,7 +51,8 @@ const writePaths = [
   '/getNoRegistStories',
   '/setAnimeStory',
   '/setAnimeReview',
-  '/setAnimeAbout'
+  '/setAnimeAbout',
+  '/setAnimeStatus'
 ];
 router.use(writePaths, require('cors')(), auth.requireWriteAuth);
 
@@ -91,6 +92,10 @@ getReview.search(router, animeModel);
 // GET /getAllAnimeReview
 getReview.getAll(router, animeModel);
 
+// 特定の視聴ステータスのアニメを取得する
+// GET /getAnimeByStatus/:status
+getReview.getByStatus(router, animeModel);
+
 // アニメの全話数情報を取得
 // GET /getAnimeStoryList/:tid
 getInfo.getAnyDay(router, animeModel);
@@ -114,5 +119,9 @@ updateInfo.setReview(router, animeModel);
 // アニメの概要を更新
 // POST /setAnimeAbout
 updateInfo.setAbout(router, animeModel);
+
+// アニメの視聴ステータスを更新
+// POST /setAnimeStatus
+updateInfo.setStatus(router, animeModel);
 
 module.exports = router;

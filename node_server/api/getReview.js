@@ -162,3 +162,34 @@ exports.getAll = (router, animeModel) => {
     res.send(res_body);
   });
 }
+
+// 特定の視聴ステータスのアニメを取得する
+const VIEW_STATUSES = ['unwatched', 'watching', 'watched', 'stalled', 'dropped'];
+exports.getByStatus = (router, animeModel) => {
+  router.get("/getAnimeByStatus/:status", cors(), async (req, res)=>{
+    res.header('Content-Type', 'application/json');
+    const status = req.params.status;
+    if(!VIEW_STATUSES.includes(status)) {
+      res.send({
+        status: 'ng',
+        body: '不明なステータスです'
+      });
+      return;
+    }
+    const reviewList = await animeModel.review.getAllAnimeReview();
+    const animeAboutList = await animeModel.about.getAllAnime();
+    const animeList = mergeAnimeInfo(animeAboutList, reviewList);
+    const filtered = animeList.filter((anime)=>{
+      if(status === 'unwatched') {
+        // レビュー行が無い（status を持たない）作品も未視聴に含める
+        return anime.status === 'unwatched' || anime.status === undefined || anime.status === null;
+      }
+      return anime.status === status;
+    });
+    let res_body = {
+      status: 'ok',
+      body: filtered
+    };
+    res.send(res_body);
+  });
+}

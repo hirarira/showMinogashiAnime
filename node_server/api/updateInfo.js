@@ -91,3 +91,42 @@ exports.setAbout = (router, animeModel) => {
   });
 }
 
+
+// アニメの視聴ステータスを更新（レビュー行が無ければ作る）
+// POST /setAnimeStatus
+const VIEW_STATUSES = ['unwatched', 'watching', 'watched', 'stalled', 'dropped'];
+exports.setStatus = (router, animeModel) => {
+  router.post("/setAnimeStatus", (req, res)=>{
+    res.header('Content-Type', 'application/json');
+    const status = req.body.status;
+    if(!VIEW_STATUSES.includes(status)) {
+      let res_body = {
+        status: 'ng',
+        date: moment(),
+        e: '不明なステータスです'
+      };
+      res.send(res_body);
+      return;
+    }
+    let options = {
+      tid: req.body.tid,
+      status: status
+    };
+    animeModel.review.updateStatus(options)
+    .then((response)=>{
+      let res_body = {
+        status: 'ok',
+        date: moment()
+      };
+      res.send(res_body);
+    })
+    .catch((e)=>{
+      let res_body = {
+        status: 'ng',
+        date: moment(),
+        e: e
+      };
+      res.send(res_body);
+    });
+  });
+}
