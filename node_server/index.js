@@ -12,7 +12,8 @@ const username = process.env.ANIME_SHOBOI_CALENDAR_USERNAME;
 app.use(BodyParser.urlencoded({
     extended: true
 }));
-app.use(BodyParser.json());
+// サムネイルの base64 アップロードを受けられるよう JSON の上限を広げる
+app.use(BodyParser.json({ limit: '8mb' }));
 
 let server = app.listen(3333, function(){
     console.log("Node.js is listening to PORT:" + server.address().port);

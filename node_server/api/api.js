@@ -30,6 +30,9 @@ router.use(function timeLog (req, res, next) {
   next();
 });
 
+// サムネイル画像の配信（実ファイルは node_server/thumbnails、DBにはファイル名だけを持つ）
+router.use('/thumbnails', Express.static(require('path').join(__dirname, '..', 'thumbnails')));
+
 // 認証テスト用エンドポイント（Google ID トークン必須）
 // GET /authTest
 router.get("/authTest", require('cors')(), auth.requireGoogleAuth, (req, res)=>{
@@ -52,7 +55,9 @@ const writePaths = [
   '/setAnimeStory',
   '/setAnimeReview',
   '/setAnimeAbout',
-  '/setAnimeStatus'
+  '/setAnimeStatus',
+  '/setAnimeThumbnail',
+  '/deleteAnimeThumbnail'
 ];
 router.use(writePaths, require('cors')(), auth.requireWriteAuth);
 
@@ -123,5 +128,13 @@ updateInfo.setAbout(router, animeModel);
 // アニメの視聴ステータスを更新
 // POST /setAnimeStatus
 updateInfo.setStatus(router, animeModel);
+
+// サムネイル画像を保存
+// POST /setAnimeThumbnail
+updateInfo.setThumbnail(router, animeModel);
+
+// サムネイル画像を削除
+// POST /deleteAnimeThumbnail
+updateInfo.deleteThumbnail(router, animeModel);
 
 module.exports = router;

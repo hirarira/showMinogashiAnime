@@ -16,6 +16,13 @@ function mergeAnimeInfo(animeAboutList, reviewList) {
         animeList.push( animeAbout.dataValues );
       }
     });
+    // サムネイルはDBにファイル名だけを持つので、配信URLを組み立てて返す
+    const thumbnailBase = process.env.ANIME_THUMBNAIL_BASE_URL || 'https://pollux.hirarira.net/showMinogashiAnime/api/thumbnails/';
+    animeList.forEach((anime)=>{
+      if(anime.thumbnail && !anime.thumbnail.startsWith('http')){
+        anime.thumbnail = thumbnailBase + anime.thumbnail;
+      }
+    });
     return animeList;
   }
   catch(e) {
