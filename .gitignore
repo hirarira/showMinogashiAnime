@@ -2,3 +2,5 @@
 /node_server/tmp/
 /sql/tmp
 .env
+/node_server/thumbnails/*
+!/node_server/thumbnails/.gitkeep

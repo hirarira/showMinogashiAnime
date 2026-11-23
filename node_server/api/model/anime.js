@@ -13,7 +13,8 @@ module.exports = class{
       url: Sequelize.TEXT,
       hashTag: Sequelize.TEXT,
       characterURL: Sequelize.TEXT,
-      publicURL: Sequelize.TEXT
+      publicURL: Sequelize.TEXT,
+      thumbnail: Sequelize.STRING
     }, {
       // モデル名をそのままテーブル名として使う
       freezeTableName: true,
@@ -65,6 +66,15 @@ module.exports = class{
     },{
       where: {
         tid: options.tid
+      }
+    });
+  }
+  updateThumbnail(fileName, tid){
+    return this.model.update({
+      thumbnail: fileName
+    },{
+      where: {
+        tid: tid
       }
     });
   }

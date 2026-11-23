@@ -2,6 +2,15 @@
 const cors = require('cors');
 
 // アニメ概要Listと評価Listをマージして返す
+// サムネイルはDBにファイル名だけを持つので、配信URLを組み立てる
+function toThumbnailUrl(thumbnail){
+  if(!thumbnail || thumbnail.startsWith('http')){
+    return thumbnail;
+  }
+  const thumbnailBase = process.env.ANIME_THUMBNAIL_BASE_URL || 'https://pollux.hirarira.net/showMinogashiAnime/api/thumbnails/';
+  return thumbnailBase + thumbnail;
+}
+
 function mergeAnimeInfo(animeAboutList, reviewList) {
   try {
     let animeList = [];
@@ -15,6 +24,9 @@ function mergeAnimeInfo(animeAboutList, reviewList) {
       else {
         animeList.push( animeAbout.dataValues );
       }
+    });
+    animeList.forEach((anime)=>{
+      anime.thumbnail = toThumbnailUrl(anime.thumbnail);
     });
     return animeList;
   }
@@ -55,9 +67,11 @@ exports.getOne = (router, animeModel) => {
       else{
         // アニメ概要がない場合には新規作成する
         if(db_data[1].length) {
+          const merged = Object.assign(db_data[0][0].dataValues, db_data[1][0].dataValues);
+          merged.thumbnail = toThumbnailUrl(merged.thumbnail);
           const res_body = {
             status: 'ok',
-            body: Object.assign(db_data[0][0].dataValues, db_data[1][0].dataValues)
+            body: merged
           };
           res.send(res_body);
         }

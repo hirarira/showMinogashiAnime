@@ -1,5 +1,7 @@
 "use strict";
 const moment = require('moment');
+const fs = require('fs');
+const path = require('path');
 
 // アニメの話数情報を更新
 // POST /setAnimeStory
@@ -128,5 +130,89 @@ exports.setStatus = (router, animeModel) => {
       };
       res.send(res_body);
     });
+  });
+}
+
+// サムネイル画像の保存先と制限（画像そのものはDBに入れず、ファイル名だけを anime.thumbnail に持つ）
+const THUMBNAIL_DIR = path.join(__dirname, '..', 'thumbnails');
+const THUMBNAIL_MAX_SIZE = 4 * 1024 * 1024;
+const THUMBNAIL_EXTS = ['jpg', 'png', 'webp', 'gif'];
+
+// 画像形式をマジックバイトで判定する（判定できなければ null）
+function detectThumbnailExt(buf){
+  if(buf.length >= 3 && buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF) return 'jpg';
+  if(buf.length >= 4 && buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4E && buf[3] === 0x47) return 'png';
+  if(buf.length >= 4 && buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x38) return 'gif';
+  if(buf.length >= 12 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') return 'webp';
+  return null;
+}
+
+// サムネイル画像を保存する
+// POST /setAnimeThumbnail {tid, dataBase64}
+exports.setThumbnail = (router, animeModel) => {
+  router.post("/setAnimeThumbnail", async (req, res)=>{
+    res.header('Content-Type', 'application/json');
+    const sendNg = (message)=>{
+      res.send({ status: 'ng', date: moment(), message: message });
+    };
+    try {
+      const tid = Number(req.body.tid);
+      if(!Number.isInteger(tid) || tid <= 0 || typeof req.body.dataBase64 !== 'string'){
+        sendNg('invalid params');
+        return;
+      }
+      const buf = Buffer.from(req.body.dataBase64, 'base64');
+      if(buf.length === 0 || buf.length > THUMBNAIL_MAX_SIZE){
+        sendNg('invalid image size');
+        return;
+      }
+      const ext = detectThumbnailExt(buf);
+      if(!ext){
+        sendNg('unsupported image type');
+        return;
+      }
+      const rows = await animeModel.about.getAnime(tid);
+      if(!rows || rows.length === 0){
+        sendNg('anime not found');
+        return;
+      }
+      const fileName = tid + '.' + ext;
+      fs.mkdirSync(THUMBNAIL_DIR, { recursive: true });
+      // 拡張子の違う旧ファイルを消してから新しいファイルを書く
+      THUMBNAIL_EXTS.forEach((e)=>{
+        if(e !== ext){
+          try { fs.unlinkSync(path.join(THUMBNAIL_DIR, tid + '.' + e)); } catch(e2) {}
+        }
+      });
+      fs.writeFileSync(path.join(THUMBNAIL_DIR, fileName), buf);
+      await animeModel.about.updateThumbnail(fileName, tid);
+      res.send({ status: 'ok', date: moment(), thumbnail: fileName });
+    }
+    catch(e) {
+      res.send({ status: 'ng', date: moment(), e: String(e) });
+    }
+  });
+}
+
+// サムネイル画像を削除する
+// POST /deleteAnimeThumbnail {tid}
+exports.deleteThumbnail = (router, animeModel) => {
+  router.post("/deleteAnimeThumbnail", async (req, res)=>{
+    res.header('Content-Type', 'application/json');
+    try {
+      const tid = Number(req.body.tid);
+      if(!Number.isInteger(tid) || tid <= 0){
+        res.send({ status: 'ng', date: moment(), message: 'invalid params' });
+        return;
+      }
+      THUMBNAIL_EXTS.forEach((e)=>{
+        try { fs.unlinkSync(path.join(THUMBNAIL_DIR, tid + '.' + e)); } catch(e2) {}
+      });
+      await animeModel.about.updateThumbnail(null, tid);
+      res.send({ status: 'ok', date: moment() });
+    }
+    catch(e) {
+      res.send({ status: 'ng', date: moment(), e: String(e) });
+    }
   });
 }
